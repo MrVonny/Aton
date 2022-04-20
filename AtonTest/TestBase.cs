@@ -1,10 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Aton.Database;
-using Aton.Models.Identity;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using Moq.EntityFrameworkCore;
 using NUnit.Framework;
 
 namespace AtonTest;

@@ -17,7 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Aton\Aton.csproj" />
+      <ProjectReference Include="..\Aton.Services.Api\Aton.Services.Api.csproj" />
     </ItemGroup>
 
 </Project>

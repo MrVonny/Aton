@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MediatR" Version="10.0.1" />
+      <PackageReference Include="Microsoft.AspNetCore.Authorization" Version="6.0.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.4" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.4" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Aton.Application\Aton.Application.csproj" />
+      <ProjectReference Include="..\Aton.Domain.Core\Aton.Domain.Core.csproj" />
+      <ProjectReference Include="..\Aton.Infrastructure.Bus\Aton.Infrastructure.Bus.csproj" />
+      <ProjectReference Include="..\Aton.Infrastructure.Data\Aton.Infrastructure.Data.csproj" />
+      <ProjectReference Include="..\Aton.Infrastructure.Identity\Aton.Infrastructure.Identity.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Aton.Models.Identity;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace AtonTest;
