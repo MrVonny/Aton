@@ -5,6 +5,7 @@ using Aton.Domain.Core.Notifications;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Infrastructure.Identity.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aton.Services.Api.Controllers;
