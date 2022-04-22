@@ -6,6 +6,7 @@ public interface IUserAppService : IDisposable
 {
     void Create(CreateUserViewModel createUserViewModel);
     IEnumerable<UserViewModel> GetAll();
+    IEnumerable<UserViewModel> GetActiveOrdered();
     IEnumerable<UserViewModel> GetAll(int skip, int take);
     UserViewModel GetById(Guid id);
     void Update(UserViewModel userViewModel);

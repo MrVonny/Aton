@@ -33,6 +33,12 @@ public class UserAppService : IUserAppService
         throw new NotImplementedException();
     }
 
+    public IEnumerable<UserViewModel> GetActiveOrdered()
+    {
+        var active = _userRepository.GetActiveOrdered();
+        return _mapper.Map<IEnumerable<UserViewModel>>(active);
+    }
+
     public IEnumerable<UserViewModel> GetAll(int skip, int take)
     {
         throw new NotImplementedException();

@@ -2,6 +2,7 @@ using Aton.Domain.Commands;
 using Aton.Domain.Core.Bus;
 using Aton.Domain.Core.Notifications;
 using Aton.Domain.Intefaces;
+using Aton.Domain.Models;
 using MediatR;
 
 namespace Aton.Domain.CommandHandlers
@@ -23,9 +24,27 @@ namespace Aton.Domain.CommandHandlers
             _bus = bus;
         }
         
-        public Task<bool> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        public Task<bool> Handle(CreateUserCommand message, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            if (!message.IsValid())
+            {
+                NotifyValidationErrors(message);
+                return Task.FromResult(false);
+            }
+
+            var user = new User(Guid.NewGuid(), message.Login, message.Name, message.Gender, message.Birthday);
+
+            if (_userRepository.GetByLogin(user.Login) != null)
+            {
+                _bus.RaiseEvent(new DomainNotification(message.MessageType, "User with this login is already registered."));
+                return Task.FromResult(false);
+            }
+
+            _userRepository.Add(user);
+
+            Commit();
+
+            return Task.FromResult(true);
         }
     }
 }

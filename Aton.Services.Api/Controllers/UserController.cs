@@ -25,10 +25,13 @@ public class UserController : ApiController
         _accountManager = accountManager;
     }
 
-    [HttpGet("pon")]
-    public async Task<IActionResult> Test()
+    [HttpGet]
+    [Route("active")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetActive()
     {
-        return Ok("SEX");
+        var active = _userAppService.GetActiveOrdered();
+        return Response(active);
     }
 
     #region Create
@@ -166,26 +169,7 @@ public class UserController : ApiController
     // /// CreatedOn (Доступно Админам)
     // /// </summary>
     // /// <returns></returns>
-    // [HttpGet]
-    // [Route("active")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // public async Task<ActionResult> GetActive()
-    // {
-    //     try
-    //     {
-    //         var users = await _context.Users
-    //             .Where(u => u.RevokedOn.HasValue)
-    //             .OrderBy(u => u.CreatedOn)
-    //             .ToIndexModel()
-    //             .ToListAsync();
-    //
-    //         return Ok(users);
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError);
-    //     }
-    // }
+    // 
     //
     // [HttpGet]
     // [Route("{login}")]

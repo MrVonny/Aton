@@ -1,4 +1,5 @@
 ﻿using Aton.Domain.Core.Models;
+using Aton.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
@@ -9,6 +10,8 @@ public class ApplicationDbContext : DbContext
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
     }
+    
+    public DbSet<User> Users { get; set; }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {

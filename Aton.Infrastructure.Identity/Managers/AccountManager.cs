@@ -14,17 +14,31 @@ public class AccountManager
 
     public async Task<IdentityResult> CreateAsync(Account account)
     {
-        throw new NotImplementedException();
+        var find = await _accountContext.Accounts.FindAsync(account.Login);
+            if (find != null)
+                return new IdentityResult(new IdentityError("Already exists"));
+            _accountContext.Accounts.Add(account);
+            await _accountContext.SaveChangesAsync();
+            return new IdentityResult();
     }
 }
 
 public class IdentityResult
 {
-    public bool IsSuccess => throw new NotImplementedException();
-    public IEnumerable<IdentityError> Errors => throw new NotImplementedException();
+    public IdentityResult(params IdentityError[] errors)
+    {
+        Errors = errors;
+    }
+    public bool IsSuccess => !Errors.Any();
+    public IEnumerable<IdentityError> Errors { get; protected set; }
 }
 
 public class IdentityError
 {
+    public IdentityError(string description)
+    {
+        Description = description;
+    }
+
     public string Description { get; protected set; }
 }

@@ -12,6 +12,12 @@ public class UserRepository : Repository<User>, IUserRepository
 
     public User GetByLogin(string login)
     {
-        throw new NotImplementedException();
+        return DbSet.SingleOrDefault(u => u.Login.Equals(login));
+    }
+
+    public IEnumerable<User> GetActiveOrdered()
+    {
+        return DbSet.Where(u => !u.RevokedAt.HasValue)
+            .OrderBy(u => u.CreatedAt);
     }
 }

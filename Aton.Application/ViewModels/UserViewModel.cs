@@ -13,9 +13,9 @@ public class UserViewModel
 
     [Required]
     [RegularExpression(@"[ЁёА-яa-zA-Z]")]
-    public string UserName { get; set; }
+    public string Name { get; set; }
     
-    public Gender? Gender { get; set; }
+    public Gender Gender { get; set; }
     //[Range(typeof(DateTime), "1/1/1900", null)]
     public DateTime? Birthday { get; set; } 
     public bool? Admin { get; set; }

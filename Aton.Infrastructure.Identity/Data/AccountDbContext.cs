@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Aton.Infrastructure.Identity.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aton.Infrastructure.Identity.Data;
 
@@ -9,5 +10,6 @@ public sealed class AccountDbContext : DbContext
     {
         
     }
-    
+
+    public DbSet<Account> Accounts { get; set; }
 }
