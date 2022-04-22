@@ -16,6 +16,16 @@ public class AccountManager
     {
         throw new NotImplementedException();
     }
+    
+    public async Task<Account> FindByLoginAsync(string login)
+    {
+        throw new NotImplementedException();
+    }
+    
+    public async Task<bool> IsAdminAsync(string login)
+    {
+        throw new NotImplementedException();
+    }
 }
 
 public class IdentityResult

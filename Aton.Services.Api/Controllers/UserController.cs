@@ -5,30 +5,36 @@ using Aton.Domain.Core.Notifications;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Infrastructure.Identity.Models;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Aton.Services.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/users")]
 public class UserController : ApiController
 {
     private readonly IUserAppService _userAppService;
     private readonly AccountManager _accountManager;
+    private readonly SignInManager _signInManager;
 
     public UserController(
         IUserAppService userAppService,
         INotificationHandler<DomainNotification> notifications,
-        IMediatorHandler mediator, AccountManager accountManager) : base(notifications, mediator)
+        IMediatorHandler mediator,
+        AccountManager accountManager,
+        SignInManager signInManager) : base(notifications, mediator)
     {
         _userAppService = userAppService;
         _accountManager = accountManager;
+        _signInManager = signInManager;
     }
 
     [HttpGet("pon")]
     public async Task<IActionResult> Test()
     {
-        return Ok("SEX");
+        return Response("Ok");
     }
 
     #region Create
@@ -40,6 +46,7 @@ public class UserController : ApiController
     /// <param name="createUserViewModel"></param>
     /// <returns></returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateUserViewModel createUserViewModel)
