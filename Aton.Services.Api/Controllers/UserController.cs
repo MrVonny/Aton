@@ -10,19 +10,24 @@ using Microsoft.AspNetCore.Mvc;
 namespace Aton.Services.Api.Controllers;
 
 [ApiController]
+[Authorize]
 [Route("api/v1/users")]
 public class UserController : ApiController
 {
     private readonly IUserAppService _userAppService;
     private readonly AccountManager _accountManager;
+    private readonly SignInManager _signInManager;
 
     public UserController(
         IUserAppService userAppService,
         INotificationHandler<DomainNotification> notifications,
-        IMediatorHandler mediator, AccountManager accountManager) : base(notifications, mediator)
+        IMediatorHandler mediator,
+        AccountManager accountManager,
+        SignInManager signInManager) : base(notifications, mediator)
     {
         _userAppService = userAppService;
         _accountManager = accountManager;
+        _signInManager = signInManager;
     }
 
     [HttpGet]
@@ -43,6 +48,7 @@ public class UserController : ApiController
     /// <param name="createUserViewModel"></param>
     /// <returns></returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateUserViewModel createUserViewModel)
@@ -169,7 +175,26 @@ public class UserController : ApiController
     // /// CreatedOn (Доступно Админам)
     // /// </summary>
     // /// <returns></returns>
-    // 
+    // [HttpGet]
+    // [Route("active")]
+    // [ProducesResponseType(StatusCodes.Status200OK)]
+    // public async Task<ActionResult> GetActive()
+    // {
+    //     try
+    //     {
+    //         var users = await _context.Users
+    //             .Where(u => u.RevokedOn.HasValue)
+    //             .OrderBy(u => u.CreatedOn)
+    //             .ToIndexModel()
+    //             .ToListAsync();
+    //
+    //         return Ok(users);
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         return StatusCode(StatusCodes.Status500InternalServerError);
+    //     }
+    // }
     //
     // [HttpGet]
     // [Route("{login}")]
