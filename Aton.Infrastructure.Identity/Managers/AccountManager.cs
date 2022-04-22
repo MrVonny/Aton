@@ -1,5 +1,6 @@
 ﻿using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Aton.Infrastructure.Identity.Managers;
 
@@ -19,12 +20,13 @@ public class AccountManager
     
     public async Task<Account> FindByLoginAsync(string login)
     {
-        throw new NotImplementedException();
+        return await _accountContext.Accounts.FindAsync(login);
     }
     
     public async Task<bool> IsAdminAsync(string login)
     {
-        throw new NotImplementedException();
+        var acc = await FindByLoginAsync(login);
+        return acc.Admin;
     }
 }
 
