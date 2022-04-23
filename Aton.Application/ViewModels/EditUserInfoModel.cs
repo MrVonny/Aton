@@ -1,12 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Aton.Domain.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Aton.Application.ViewModels;
 
 public class EditUserInfoModel
 {
-    //[FromRoute(Name = "login")]
-    public string Id { get; set; }
+    [FromRoute(Name = "login")]
+    public string Login { get; set; }
+    public Guid? Guid { get; set; }
     [RegularExpression(@"[ЁёА-яa-zA-Z]")]
     public string UserName { get; set; }
     public Gender Gender { get; set; }

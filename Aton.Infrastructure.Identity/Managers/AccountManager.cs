@@ -1,4 +1,5 @@
-﻿using Aton.Infrastructure.Identity.Data;
+﻿using Aton.Domain.Models;
+using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,13 +17,13 @@ public class AccountManager
     public async Task<IdentityResult> CreateAsync(Account account)
     {
         var find = await _accountContext.Accounts.FindAsync(account.Login);
-            if (find != null)
-                return new IdentityResult(new IdentityError("Already exists"));
-            _accountContext.Accounts.Add(account);
-            await _accountContext.SaveChangesAsync();
-            return new IdentityResult();
+        if (find != null)
+            return new IdentityResult(new IdentityError("Already exists"));
+        _accountContext.Accounts.Add(account);
+        await _accountContext.SaveChangesAsync();
+        return new IdentityResult();
     }
-    
+
     public async Task<Account> FindByLoginAsync(string login)
     {
         return await _accountContext.Accounts.FindAsync(login);
@@ -32,6 +33,34 @@ public class AccountManager
     {
         var acc = await FindByLoginAsync(login);
         return acc.Admin;
+    }
+
+    public async Task<Guid?> GetGuid(string login)
+    {
+        var atc = await _accountContext.AccountToUser.SingleOrDefaultAsync(atu => atu.AccountLogin.Equals(login));
+        return atc?.UserId;
+    }
+
+    public async Task<IdentityResult> ChangeLogin(string login, string newLogin)
+    {
+        var account = await FindByLoginAsync(login);
+        if (account == null)
+            return new IdentityResult(new IdentityError("Account doesn't exists"));
+        if(await _accountContext.Accounts.AnyAsync(a=>a.Login.Equals(newLogin)))
+            return new IdentityResult(new IdentityError("Login already taken"));
+        account.Login = newLogin;
+        await _accountContext.SaveChangesAsync();
+        return new IdentityResult();
+    }
+
+    public async Task<IdentityResult> ChangePassword(string login, string newPassword)
+    {
+        var acc = await FindByLoginAsync(login);
+        if (acc == null)
+            return new IdentityResult(new IdentityError("Account doesn't exists"));
+        acc.Password = newPassword;
+        await _accountContext.SaveChangesAsync();
+        return new IdentityResult();
     }
 }
 

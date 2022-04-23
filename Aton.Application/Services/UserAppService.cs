@@ -2,7 +2,9 @@
 using Aton.Application.ViewModels;
 using Aton.Domain.Commands;
 using Aton.Domain.Core.Bus;
+using Aton.Domain.Core.Commands;
 using Aton.Domain.Intefaces;
+using Aton.Domain.Models;
 using AutoMapper;
 
 namespace Aton.Application.Services;
@@ -22,10 +24,11 @@ public class UserAppService : IUserAppService
         _bus = bus;
     }
     
-    public void Create(CreateUserViewModel createUserViewModel)
+    public async Task<Guid> Create(CreateUserViewModel createUserViewModel)
     {
-        var registerCommand = _mapper.Map<CreateUserCommand>(createUserViewModel);
-        _bus.SendCommand(registerCommand);
+        var createCommand = _mapper.Map<CreateUserCommand>(createUserViewModel);
+        var user = await _bus.SendCommand(createCommand);
+        return user.Id;
     }
 
     public IEnumerable<UserViewModel> GetAll()
@@ -42,6 +45,13 @@ public class UserAppService : IUserAppService
     public IEnumerable<UserViewModel> GetAll(int skip, int take)
     {
         throw new NotImplementedException();
+    }
+
+    public async Task<UserViewModel> Edit(EditUserInfoModel editUserInfoModel)
+    {
+        var editCommand = _mapper.Map<EditUserCommand>(editUserInfoModel);
+        var user = await _bus.SendCommand(editCommand);
+        return _mapper.Map<UserViewModel>(user);
     }
 
     public UserViewModel GetById(Guid id)

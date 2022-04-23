@@ -5,6 +5,7 @@ using Aton.Domain.Commands;
 using Aton.Domain.Core.Bus;
 using Aton.Domain.Core.Notifications;
 using Aton.Domain.Intefaces;
+using Aton.Domain.Models;
 using Aton.Infrastructure.Bus;
 using Aton.Infrastructure.Data.Contexts;
 using Aton.Infrastructure.Data.Repository;
@@ -40,7 +41,8 @@ namespace Aton.Infrastructure.IoC
             //services.AddScoped<INotificationHandler<CustomerRemovedEvent>, CustomerEventHandler>();
 
             // Domain - Commands
-            services.AddScoped<IRequestHandler<CreateUserCommand, bool>, UserCommandHandler>();
+            services.AddScoped<IRequestHandler<CreateUserCommand, User>, UserCommandHandler>();
+            services.AddScoped<IRequestHandler<EditUserCommand, User>, UserCommandHandler>();
 
             // Domain - 3rd parties
             // services.AddScoped<IHttpService, HttpService>();

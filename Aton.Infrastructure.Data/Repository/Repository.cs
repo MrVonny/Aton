@@ -20,9 +20,9 @@ namespace Aton.Infrastructure.Data.Repository
             DbSet.Add(obj);
         }
 
-        public virtual TEntity GetById(Guid id)
+        public virtual async Task<TEntity> GetById(Guid id)
         {
-            return DbSet.Find(id);
+            return await DbSet.FindAsync(id);
         }
 
         public virtual IQueryable<TEntity> GetAll()

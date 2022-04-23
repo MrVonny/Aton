@@ -3,7 +3,7 @@ namespace Aton.Domain.Intefaces
     public interface IRepository<TEntity> : IDisposable where TEntity : class
     {
         void Add(TEntity obj);
-        TEntity GetById(Guid id);
+        Task<TEntity> GetById(Guid id);
         IQueryable<TEntity> GetAll();
         //IQueryable<TEntity> GetAll(ISpecification<TEntity> spec);
         IQueryable<TEntity> GetAllSoftDeleted();
