@@ -15,9 +15,15 @@ public class InMemoryBus : IMediatorHandler
         _mediator = mediator;
     }
 
-    public Task SendCommand<T>(T command) where T : Command
+    // public Task SendCommand<T>(T command) where T : Command
+    // {
+    //     _mediator.Send(command);
+    // }
+
+
+    public Task<T> SendCommand<T>(Command<T> command) where T : class
     {
-        return _mediator.Send(command);
+        return _mediator.Send((IRequest<T>)command);
     }
 
     public Task RaiseEvent<T>(T @event) where T : Event
