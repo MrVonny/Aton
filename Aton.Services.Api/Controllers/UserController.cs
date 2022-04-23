@@ -34,20 +34,14 @@ public class UserController : ApiController
     [HttpGet]
     [Route("active")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetActive()
+    public async Task<IActionResult> GetActiveOrdered()
     {
         var active = _userAppService.GetActiveOrdered();
         return Response(active);
     }
 
     #region Create
-
-    /// <summary>
-    /// 1) Создание пользователя по логину, паролю, имени, полу и дате рождения + указание будет ли
-    /// пользователь админом (Доступно Админам)
-    /// </summary>
-    /// <param name="createUserViewModel"></param>
-    /// <returns></returns>
+    
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
@@ -59,12 +53,14 @@ public class UserController : ApiController
             NotifyModelStateErrors();
             return Response(createUserViewModel);
         }
+        var userGuid = await _userAppService.Create(createUserViewModel);
 
         var account = new Account(
             createUserViewModel.Login,
             createUserViewModel.Password,
+            userGuid,
             createUserViewModel.Admin.GetValueOrDefault());
-        
+
         var identityResult = await _accountManager.CreateAsync(account);
 
         if (!identityResult.IsSuccess)
@@ -72,9 +68,7 @@ public class UserController : ApiController
             AddIdentityErrors(identityResult);
                 return Response();
         }
-
-        _userAppService.Create(createUserViewModel);
-
+        
         return Response(createUserViewModel);
     }
 
@@ -82,89 +76,68 @@ public class UserController : ApiController
 
     // #region Update-1
     //
-    // [HttpPost]
-    // [Route("{login}/info")]
-    // public async Task<ActionResult> Update(EditUserInfoModel editUserInfoModel)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
-    //
-    //     try
-    //     {
-    //         var config = new MapperConfiguration(cfg => cfg.CreateMap<EditUserInfoModel, User>());
-    //         var mapper = new Mapper(config);
-    //
-    //         var user = await _context.Users.SingleOrDefaultAsync(u => u.Id.Equals(editUserInfoModel.Id));
-    //
-    //         if (user == null)
-    //             return BadRequest($"User with ID {editUserInfoModel.Id} doesn't exists");
-    //
-    //         mapper.Map(editUserInfoModel, user);
-    //
-    //         await _context.SaveChangesAsync();
-    //         return Ok(user.ToIndexModel());
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError);
-    //     }
-    // }
+    [HttpPost]
+    [Route("{login}/info")]
+    public async Task<IActionResult> Update(EditUserInfoModel editUserInfoModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            NotifyModelStateErrors();
+            return Response(editUserInfoModel);
+        }
 
-    // [HttpPost]
-    // [Route("{login}/login")]
-    // public async Task<ActionResult> Update(EditAccountLoginModel editUserLoginModel)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
-    //
-    //     try
-    //     {
-    //         var config = new MapperConfiguration(cfg => cfg.CreateMap<EditAccountLoginModel, User>());
-    //         var mapper = new Mapper(config);
-    //
-    //         var user = await _context.Users.SingleOrDefaultAsync(u => u.Id.Equals(editUserLoginModel.Login));
-    //
-    //         if (user == null)
-    //             return BadRequest($"User with login {editUserLoginModel.Login} doesn't exists");
-    //
-    //         mapper.Map(editUserLoginModel, user);
-    //
-    //         await _context.SaveChangesAsync();
-    //         return Ok(user.ToIndexModel());
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError);
-    //     }
-    // }
-    //
-    // [HttpPost]
-    // [Route("{login}/password")]
-    // public async Task<ActionResult> Update(EditUserPasswordModel editUserPasswordModel)
-    // {
-    //     if (!ModelState.IsValid)
-    //         return BadRequest(ModelState);
-    //
-    //     try
-    //     {
-    //         var config = new MapperConfiguration(cfg => cfg.CreateMap<EditUserPasswordModel, User>());
-    //         var mapper = new Mapper(config);
-    //
-    //         var user = await _context.Users.SingleOrDefaultAsync(u => u.Id.Equals(editUserPasswordModel.Login));
-    //
-    //         if (user == null)
-    //             return BadRequest($"User with login {editUserPasswordModel.Login} doesn't exists");
-    //
-    //         mapper.Map(editUserPasswordModel, user);
-    //
-    //         await _context.SaveChangesAsync();
-    //         return Ok(user.ToIndexModel());
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError);
-    //     }
-    // }
+        var guid = await _accountManager.GetGuid(editUserInfoModel.Login);
+        if (guid == null)
+        {
+           NotifyError(string.Empty, "User doesn't exists");
+           return Response(editUserInfoModel);
+        }
+
+        var user = await _userAppService.Edit(editUserInfoModel);
+
+        return Response(user);
+    }
+
+    [HttpPost]
+    [Route("{login}/login")]
+    public async Task<IActionResult> Update(EditAccountLoginModel editUserLoginModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            NotifyModelStateErrors();
+            return Response(editUserLoginModel);
+        }
+
+        var identityResult = await _accountManager.ChangeLogin(editUserLoginModel.Login, editUserLoginModel.NewLogin);
+        if (!identityResult.IsSuccess)
+        {
+            AddIdentityErrors(identityResult);
+            return Response();
+        }
+        
+        return Response(editUserLoginModel);
+    }
+    
+    [HttpPost]
+    [Route("{login}/password")]
+    public async Task<IActionResult> Update(EditAccountPasswordModel editUserPasswordModel)
+    {
+        if (!ModelState.IsValid)
+        {
+            NotifyModelStateErrors();
+            return Response(editUserPasswordModel);
+        }
+
+        var identityResult =
+            await _accountManager.ChangePassword(editUserPasswordModel.Login, editUserPasswordModel.NewPassword);
+        if (!identityResult.IsSuccess)
+        {
+            AddIdentityErrors(identityResult);
+            return Response();
+        }
+        
+        return Response(editUserPasswordModel);
+    }
     //
     // #endregion
     //
