@@ -1,5 +1,6 @@
 ﻿using FluentValidation.Results;
 using Aton.Domain.Core.Events;
+using MediatR;
 
 namespace Aton.Domain.Core.Commands;
 
@@ -14,4 +15,9 @@ public abstract class Command : Message
     }
 
     public abstract bool IsValid();
+}
+
+public abstract class Command<T> : Command, IRequest<T>
+{
+
 }

@@ -1,4 +1,5 @@
 ﻿using Aton.Domain.Models;
+using MediatR;
 
 namespace Aton.Domain.Commands;
 
@@ -18,6 +19,6 @@ public class CreateUserCommand : UserCommand
     {
         if (Birthday != null && (Birthday > DateTime.Now || Birthday.Value.Year < 1900))
             return false;
-        return true;
+        return true; 
     }
 }

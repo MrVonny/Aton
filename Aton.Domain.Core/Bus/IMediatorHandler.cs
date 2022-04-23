@@ -5,6 +5,7 @@ namespace Aton.Domain.Core.Bus;
 
 public interface IMediatorHandler
 {
-    Task SendCommand<T>(T command) where T : Command;
+    // Task SendCommand<T>(T command) where T : Command;
+    Task<T> SendCommand<T>(Command<T> command) where T : class;
     Task RaiseEvent<T>(T @event) where T : Event;
 }
