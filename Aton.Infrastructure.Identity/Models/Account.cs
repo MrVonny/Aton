@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Aton.Domain.Core.Models;
 
 namespace Aton.Infrastructure.Identity.Models;
 
-public class Account
+public class Account : EntityAudit
 {
     public Account(string login, string password, bool admin = false)
     {
@@ -11,10 +12,7 @@ public class Account
         Password = password;
         Admin = admin;
     }
-
-    [Key]
-    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-    public Guid Guid { get; set; }
+    
     public string Login { get; set; }
     public string Password { get; set; }
     public bool Admin { get; protected set; }

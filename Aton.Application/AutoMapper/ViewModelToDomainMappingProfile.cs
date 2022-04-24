@@ -9,7 +9,7 @@ namespace Aton.Application.AutoMapper
         public ViewModelToDomainMappingProfile()
         {
             CreateMap<CreateUserViewModel, CreateUserCommand>()
-                .ConstructUsing(c => new CreateUserCommand(c.Name, c.Gender.Value, c.Birthday));
+                .ConstructUsing(c => new CreateUserCommand(c.Name, c.Gender.Value ,c.Birthday));
             // CreateMap<CustomerViewModel, UpdateCustomerCommand>()
             //     .ConstructUsing(c => new UpdateCustomerCommand(c.Id, c.Name, c.Email, c.BirthDate));
         }

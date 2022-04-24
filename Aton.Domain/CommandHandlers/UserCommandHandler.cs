@@ -9,7 +9,8 @@ namespace Aton.Domain.CommandHandlers
 {
     public class UserCommandHandler : CommandHandler,
         IRequestHandler<CreateUserCommand, User>,
-        IRequestHandler<EditUserCommand, User>
+        IRequestHandler<EditUserCommand, User>,
+        IRequestHandler<RevokeUserCommand, bool>
 
     {
         private readonly IUserRepository _userRepository;
@@ -34,12 +35,15 @@ namespace Aton.Domain.CommandHandlers
             }
 
             var user = new User(Guid.NewGuid(), message.Name, message.Gender!.Value, message.Birthday);
+            user.CreatedBy = message.CreatedBy;
 
             if (await _userRepository.GetById(user.Id) != null)
             {
                 await _bus.RaiseEvent(new DomainNotification(message.MessageType, "User is already registered."));
                 return default;
             }
+
+            
 
             _userRepository.Add(user);
 
@@ -62,6 +66,8 @@ namespace Aton.Domain.CommandHandlers
                 return default;
             }
 
+            user.UpdatedBy = message.UpdatedBy;
+
             if (message.Birthday != null)
                 user.Birthday = message.Birthday;
             if(message.Gender != null)
@@ -72,6 +78,29 @@ namespace Aton.Domain.CommandHandlers
             Commit();
 
             return user;
+        }
+        
+        public async Task<bool> Handle(RevokeUserCommand message, CancellationToken cancellationToken)
+        {
+            if (!message.IsValid())
+            {
+                NotifyValidationErrors(message);
+                return false;
+            }
+
+            var user = await _userRepository.GetById(message.Id);
+            if (user == null)
+            {
+                await _bus.RaiseEvent(new DomainNotification(message.MessageType, $"User with Guid {message.Id} doesn't exists"));
+                return false;
+            }
+
+            user.RevokedBy = message.RevokedBy;
+            user.RevokedAt = DateTime.Now;
+
+            Commit();
+
+            return true;
         }
     }
 }

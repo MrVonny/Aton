@@ -5,7 +5,8 @@ namespace Aton.Domain.Commands;
 
 public class CreateUserCommand : UserCommand
 {
-    public CreateUserCommand(string name, Gender gender, DateTime? birthday = null)
+    public string CreatedBy { get; set; }
+    public CreateUserCommand(string name, Gender gender , DateTime? birthday = null)
     {
         Name = name;
         Gender = gender;

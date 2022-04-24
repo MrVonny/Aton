@@ -12,6 +12,8 @@ public class UserAppService : IUserAppService
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepository;
     private readonly IMediatorHandler _bus;
+    
+    public string CurrentUser { get; set; }
 
     public UserAppService(IMapper mapper,
         IUserRepository userRepository,
@@ -22,9 +24,10 @@ public class UserAppService : IUserAppService
         _bus = bus;
     }
     
-    public async Task<Guid?> Create(CreateUserViewModel createUserViewModel)
+    public async Task<Guid?> Create(CreateUserViewModel createUserViewModel, string createdBy)
     {
         var createCommand = _mapper.Map<CreateUserCommand>(createUserViewModel);
+        createCommand.CreatedBy = createdBy;
         var user = await _bus.SendCommand(createCommand);
         return user?.Id;
     }
@@ -45,9 +48,10 @@ public class UserAppService : IUserAppService
         throw new NotImplementedException();
     }
 
-    public async Task<UserViewModel> Edit(EditUserInfoModel editUserInfoModel)
+    public async Task<UserViewModel> Edit(EditUserInfoModel editUserInfoModel, string updatedBy)
     {
         var editCommand = _mapper.Map<EditUserCommand>(editUserInfoModel);
+        editCommand.UpdatedBy = updatedBy;
         var user = await _bus.SendCommand(editCommand);
         return _mapper.Map<UserViewModel>(user);
     }
@@ -72,7 +76,14 @@ public class UserAppService : IUserAppService
     {
         throw new NotImplementedException();
     }
-    
+
+    public async Task Revoke(Guid guid, string revokedBy)
+    {
+        var command = new RevokeUserCommand(guid, revokedBy);
+        await _bus.SendCommand(command);
+    }
+
+
     public void Dispose()
     {
         GC.SuppressFinalize(this);

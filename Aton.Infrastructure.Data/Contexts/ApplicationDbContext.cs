@@ -50,7 +50,7 @@ public sealed class ApplicationDbContext : DbContext
         var entities = ChangeTracker.Entries()
             .Where(x => x.Entity is EntityAudit)
             .ToList();
-        UpdateSoftDelete(entities);
+        //UpdateSoftDelete(entities);
         UpdateTimestamps(entities);
     }
 
@@ -82,20 +82,16 @@ public sealed class ApplicationDbContext : DbContext
         var filtered = entries
             .Where(x => x.State == EntityState.Added
                         || x.State == EntityState.Modified);
-
-        // TODO: Get real current user id
-        var currentUserId = 1;
+        
 
         foreach (var entry in filtered)
         {
             if (entry.State == EntityState.Added)
             {
                 ((EntityAudit)entry.Entity).CreatedAt = DateTime.UtcNow;
-                //((EntityAudit)entry.Entity).CreatedBy = currentUserId;
             }
 
             ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
-            //((EntityAudit)entry.Entity).UpdatedBy = currentUserId;
         }
     }
 }

@@ -9,6 +9,7 @@ using Aton.Infrastructure.Identity.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using IdentityResult = Microsoft.AspNetCore.Identity.IdentityResult;
 
 namespace Aton.Services.Api.Controllers;
 
@@ -31,6 +32,7 @@ public class UserController : ApiController
         _userAppService = userAppService;
         _accountManager = accountManager;
         _signInManager = signInManager;
+        _accountManager.CurrentUser = GetUserLogin();
     }
 
     [HttpGet]
@@ -111,7 +113,7 @@ public class UserController : ApiController
                 return Response();
         }
         
-        var userGuid = await _userAppService.Create(createUserViewModel);
+        var userGuid = await _userAppService.Create(createUserViewModel, GetUserLogin());
 
         if (userGuid == null)
         {
@@ -151,7 +153,7 @@ public class UserController : ApiController
 
         var model = new EditUserInfoModel(userGuid, name, gender, birthday);
 
-        var user = await _userAppService.Edit(model);
+        var user = await _userAppService.Edit(model, GetUserLogin());
 
         return Response(user);
     }
@@ -195,6 +197,48 @@ public class UserController : ApiController
         }
         
         return Response();
+    }
+
+    [HttpDelete]
+    [Authorize(Roles = "Admin")]
+    [Route("{login}")]
+    public async Task<IActionResult> Delete([FromRoute(Name = "login")] string login, [FromQuery] bool soft = true)
+    {
+        var guid = await _accountManager.GetUserGuid(login);
+        if (guid == null)
+        {
+            NotifyError(string.Empty,"Can't find user");
+            return Response();
+        }
+
+        if (soft)
+            await RevokeUser(login, guid.Value);
+        else
+            await DeleteUser(login, guid.Value);
+
+        return Response();
+    }
+
+    private async Task RevokeUser(string login, Guid guid)
+    {
+        var result = await _accountManager.RevokeAsync(login);
+        if (!result.IsSuccess)
+        {
+            AddIdentityErrors(result);
+            return;
+        }
+        await _userAppService.Revoke(guid, GetUserLogin());
+    }
+    
+    private async Task DeleteUser(string login, Guid guid)
+    {
+        var result = await _accountManager.Remove(login);
+        if (!result.IsSuccess)
+        {
+            AddIdentityErrors(result);
+            return;
+        }
+        _userAppService.Remove(guid);
     }
     
 

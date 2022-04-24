@@ -9,6 +9,7 @@ namespace Aton.Infrastructure.Identity.Managers;
 public class AccountManager
 {
     private readonly AccountDbContext _accountContext;
+    public string CurrentUser { get; set; } = null;
 
     public AccountManager(AccountDbContext accountContext)
     {
@@ -38,7 +39,7 @@ public class AccountManager
         if (find != null)
             return new IdentityResult(new IdentityError("Already exists"));
         _accountContext.Accounts.Add(account);
-        await _accountContext.SaveChangesAsync();
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
 
@@ -50,8 +51,8 @@ public class AccountManager
         var account = await FindByLoginAsync(login);
         if (account == null)
             return new IdentityResult(new IdentityError("Account doesn't exists"));
-        account.AccountToUser = new AccountToUser(account.Guid, userId);
-        await _accountContext.SaveChangesAsync();
+        account.AccountToUser = new AccountToUser(account.Id, userId);
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
 
@@ -90,7 +91,7 @@ public class AccountManager
             return new IdentityResult(new IdentityError("Login already taken"));
         
         account.Login = newLogin;
-        await _accountContext.SaveChangesAsync();
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
 
@@ -106,7 +107,26 @@ public class AccountManager
             return new IdentityResult(new IdentityError("Account doesn't exists"));
         
         acc.Password = newPassword;
-        await _accountContext.SaveChangesAsync();
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
+        return new IdentityResult();
+    }
+    public async Task<IdentityResult> RevokeAsync(string login)
+    {
+        var acc = await FindByLoginAsync(login);
+        if (acc == null)
+            return new IdentityResult(new IdentityError("Account doesn't exists"));
+        acc.RevokedAt = DateTime.Now;
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
+        return new IdentityResult();
+    }
+
+    public async Task<IdentityResult> Remove(string login)
+    {
+        var acc = await FindByLoginAsync(login);
+        if (acc == null)
+            return new IdentityResult(new IdentityError("Account doesn't exists"));
+        _accountContext.Remove(acc);
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
 }
