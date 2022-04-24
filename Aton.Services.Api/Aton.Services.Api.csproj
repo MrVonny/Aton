@@ -23,4 +23,8 @@
       <ProjectReference Include="..\Aton.Infrastructure.IoC\Aton.Infrastructure.IoC.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ViewModels" />
+    </ItemGroup>
+
 </Project>

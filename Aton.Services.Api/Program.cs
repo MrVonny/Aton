@@ -1,7 +1,7 @@
 using System.Reflection;
-using Aton.Infrastructure.Data.Contexts;
 using Aton.Infrastructure.IoC;
 using Aton.Services.Api.Configurations;
+using Aton.Services.Api.Filters;
 using Aton.Services.Api.StartupExtensions;
 using MediatR;
 using Microsoft.OpenApi.Models;
@@ -15,6 +15,7 @@ services.AddEndpointsApiExplorer();
 #region Configure Swagger  
 services.AddSwaggerGen(c =>  
 {  
+    c.SchemaFilter<SwaggerIgnoreFilter>();
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "BasicAuth", Version = "v1" });  
     c.AddSecurityDefinition("basic", new OpenApiSecurityScheme  
     {  

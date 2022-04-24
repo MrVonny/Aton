@@ -1,14 +1,19 @@
 ﻿using Aton.Domain.Models;
+using Aton.Domain.Validations;
 
 namespace Aton.Domain.Commands;
 
 public class EditUserCommand : UserCommand
 {
-    public string Name { get; set; }
-    public Gender? Gender { get; set; }
-    public DateTime? Birtday { get; protected set; }
+    public EditUserCommand(string name = null, Gender? gender = null, DateTime? birthday = null)
+    {
+        Name = name;
+        Gender = gender;
+        Birthday = birthday;
+    }
     public override bool IsValid()
     {
-        throw new NotImplementedException();
+        ValidationResult = new EditUserCommandValidation(this).Validate(this);
+        return ValidationResult.IsValid;
     }
 }

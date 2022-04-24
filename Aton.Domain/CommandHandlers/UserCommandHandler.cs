@@ -33,11 +33,11 @@ namespace Aton.Domain.CommandHandlers
                 return default;
             }
 
-            var user = new User(Guid.NewGuid(), message.Login, message.Name, message.Gender, message.Birthday);
+            var user = new User(Guid.NewGuid(), message.Name, message.Gender!.Value, message.Birthday);
 
-            if (_userRepository.GetByLogin(user.Login) != null)
+            if (await _userRepository.GetById(user.Id) != null)
             {
-                await _bus.RaiseEvent(new DomainNotification(message.MessageType, "User with this login is already registered."));
+                await _bus.RaiseEvent(new DomainNotification(message.MessageType, "User is already registered."));
                 return default;
             }
 
@@ -62,8 +62,8 @@ namespace Aton.Domain.CommandHandlers
                 return default;
             }
 
-            if (message.Birtday != null)
-                user.Birthday = message.Birtday;
+            if (message.Birthday != null)
+                user.Birthday = message.Birthday;
             if(message.Gender != null)
                 user.Gender = message.Gender.Value;
             if (!string.IsNullOrEmpty(user.Name))

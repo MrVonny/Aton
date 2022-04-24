@@ -1,5 +1,5 @@
 using Aton.Application.AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
+
 namespace Aton.Services.Api.Configurations
 {
     public static class AutoMapperSetup

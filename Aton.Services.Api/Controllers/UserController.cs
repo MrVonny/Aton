@@ -1,7 +1,9 @@
-﻿using Aton.Application.Interfaces;
+﻿using System.Security.Claims;
+using Aton.Application.Interfaces;
 using Aton.Application.ViewModels;
 using Aton.Domain.Core.Bus;
 using Aton.Domain.Core.Notifications;
+using Aton.Domain.Models;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Infrastructure.Identity.Models;
 using MediatR;
@@ -39,8 +41,49 @@ public class UserController : ApiController
         var active = _userAppService.GetActiveOrdered();
         return Response(active);
     }
+    
+    [HttpGet]
+    [Route("older-than/{olderThan:int}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetOlderThan([FromRoute] int? olderThan)
+    {
+        throw new NotImplementedException();
+    }
+    
+    [HttpGet]
+    [Route("{login}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> GetByLogin([FromRoute] string login)
+    {
+        if (IsUserAdmin() || GetUserLogin() == login)
+        {
+            var guid =
+                await _accountManager.GetUserGuid(login);
+            if (guid == null)
+            {
+                NotifyError(string.Empty,"Can't find user");
+                return Response();
+            }
 
-    #region Create
+            var user = await _userAppService.GetById(guid.Value);
+        
+            return Response(user);
+        }
+        NotifyError("","Forbidden");
+        return Response();
+    }
+    
+    [HttpGet]
+    [Route("me")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> Me()
+    {
+        var login = GetUserLogin();
+        return await GetByLogin(login);
+    }
+    
     
     [HttpPost]
     [Authorize(Roles = "Admin")]
@@ -53,12 +96,11 @@ public class UserController : ApiController
             NotifyModelStateErrors();
             return Response(createUserViewModel);
         }
-        var userGuid = await _userAppService.Create(createUserViewModel);
+        
 
         var account = new Account(
             createUserViewModel.Login,
             createUserViewModel.Password,
-            userGuid,
             createUserViewModel.Admin.GetValueOrDefault());
 
         var identityResult = await _accountManager.CreateAsync(account);
@@ -69,159 +111,103 @@ public class UserController : ApiController
                 return Response();
         }
         
+        var userGuid = await _userAppService.Create(createUserViewModel);
+
+        if (userGuid == null)
+        {
+            return Response();
+        }
+
+        var mapResult = await _accountManager.MapToUser(createUserViewModel.Login, userGuid.Value);
+        
+        if (!mapResult.IsSuccess)
+        {
+            AddIdentityErrors(identityResult);
+            return Response();
+        }
+
         return Response(createUserViewModel);
     }
-
-    #endregion
-
-    // #region Update-1
-    //
+    
     [HttpPost]
     [Route("{login}/info")]
-    public async Task<IActionResult> Update(EditUserInfoModel editUserInfoModel)
+    public async Task<IActionResult> UpdateInfo([FromRoute(Name = "login")] string login,
+        [FromQuery] string name = null,
+        [FromQuery] Gender? gender = null,
+        [FromQuery] DateTime? birthday = null)
     {
         if (!ModelState.IsValid)
         {
             NotifyModelStateErrors();
-            return Response(editUserInfoModel);
+            return Response();
         }
 
-        var guid = await _accountManager.GetGuid(editUserInfoModel.Login);
-        if (guid == null)
+        var userGuid = await _accountManager.GetUserGuid(login);
+        if (userGuid == null)
         {
            NotifyError(string.Empty, "User doesn't exists");
-           return Response(editUserInfoModel);
+           return Response();
         }
 
-        var user = await _userAppService.Edit(editUserInfoModel);
+        var model = new EditUserInfoModel(userGuid, name, gender, birthday);
+
+        var user = await _userAppService.Edit(model);
 
         return Response(user);
     }
 
     [HttpPost]
     [Route("{login}/login")]
-    public async Task<IActionResult> Update(EditAccountLoginModel editUserLoginModel)
+    public async Task<IActionResult> UpdateLogin([FromRoute(Name = "login")] string login, [FromQuery] string newLogin)
     {
         if (!ModelState.IsValid)
         {
             NotifyModelStateErrors();
-            return Response(editUserLoginModel);
+            return Response();
         }
 
-        var identityResult = await _accountManager.ChangeLogin(editUserLoginModel.Login, editUserLoginModel.NewLogin);
+        var identityResult = await _accountManager.ChangeLogin(login, newLogin);
         if (!identityResult.IsSuccess)
         {
             AddIdentityErrors(identityResult);
             return Response();
         }
         
-        return Response(editUserLoginModel);
+        return Response();
     }
     
     [HttpPost]
     [Route("{login}/password")]
-    public async Task<IActionResult> Update(EditAccountPasswordModel editUserPasswordModel)
+    public async Task<IActionResult> UpdatePassword([FromRoute(Name = "login")] string login, [FromQuery] string newPassword)
     {
         if (!ModelState.IsValid)
         {
             NotifyModelStateErrors();
-            return Response(editUserPasswordModel);
+            return Response();
         }
 
         var identityResult =
-            await _accountManager.ChangePassword(editUserPasswordModel.Login, editUserPasswordModel.NewPassword);
+            await _accountManager.ChangePassword(login, newPassword);
         if (!identityResult.IsSuccess)
         {
             AddIdentityErrors(identityResult);
             return Response();
         }
         
-        return Response(editUserPasswordModel);
+        return Response();
     }
-    //
-    // #endregion
-    //
-    // #region Read
-    //
-    //
-    // /// <summary>
-    // /// 5) Запрос списка всех активных (отсутствует RevokedOn) пользователей, список отсортирован по
-    // /// CreatedOn (Доступно Админам)
-    // /// </summary>
-    // /// <returns></returns>
-    // [HttpGet]
-    // [Route("active")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // public async Task<ActionResult> GetActive()
-    // {
-    //     try
-    //     {
-    //         var users = await _context.Users
-    //             .Where(u => u.RevokedOn.HasValue)
-    //             .OrderBy(u => u.CreatedOn)
-    //             .ToIndexModel()
-    //             .ToListAsync();
-    //
-    //         return Ok(users);
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError);
-    //     }
-    // }
-    //
-    // [HttpGet]
-    // [Route("{login}")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // public async Task<ActionResult> GetUser([FromRoute(Name = "login")] string login)
-    // {
-    //     var user = await _context.Users.SingleOrDefaultAsync(u => u.Login.Equals(login));
-    //     if (user != null)
-    //         return Ok(user.ToIndexModel());
-    //     return BadRequest("No such user");
-    // }
-    //
-    // /// <summary>
-    // /// 7) Запрос пользователя по логину и паролю (Доступно только самому пользователю, если он
-    // /// активен (отсутствует RevokedOn))
-    // /// </summary>
-    // /// <returns></returns>
-    // /// <exception cref="NotImplementedException"></exception>
-    // [HttpGet]
-    // [Route("me")]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // public async Task<ActionResult> Me()
-    // {
-    //     throw new NotImplementedException();
-    // }
-    //
-    // /// <summary>
-    // /// 8) Запрос всех пользователей старше определённого возраста (Доступно Админам)
-    // /// </summary>
-    // /// <returns></returns>
-    // [HttpGet]
-    // [ProducesResponseType(StatusCodes.Status200OK)]
-    // [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    // public async Task<ActionResult> GetOlderThan([FromQuery] int? olderThan)
-    // {
-    //     if (olderThan is null or <= 0 or > 100)
-    //         return BadRequest("Invalid age");
-    //     try
-    //     {
-    //         var users = await _context.Users
-    //             .OlderThan(olderThan.Value)
-    //             .ToIndexModel()
-    //             .ToListAsync();
-    //
-    //         return Ok(users);
-    //     }
-    //     catch (Exception e)
-    //     {
-    //         return StatusCode(StatusCodes.Status500InternalServerError);
-    //     }
-    // }
-    //
-    // #endregion
+    
+
+    private string GetUserLogin()
+    {
+        return HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+    }
+    
+    private bool IsUserAdmin()
+    {
+        return HttpContext.User.FindFirst(ClaimTypes.Role)?.Value == "Admin";
+    }
+    
+  
 
 }

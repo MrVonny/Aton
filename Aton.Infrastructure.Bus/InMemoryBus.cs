@@ -21,9 +21,9 @@ public class InMemoryBus : IMediatorHandler
     // }
 
 
-    public Task<T> SendCommand<T>(Command<T> command) where T : class
+    public async Task<T> SendCommand<T>(Command<T> command) where T : class
     {
-        return _mediator.Send((IRequest<T>)command);
+        return await _mediator.Send((IRequest<T>)command);
     }
 
     public Task RaiseEvent<T>(T @event) where T : Event

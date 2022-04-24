@@ -1,6 +1,7 @@
-﻿using Aton.Domain.Models;
-using Aton.Infrastructure.Identity.Data;
+﻿using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Models;
+using Aton.Infrastructure.Identity.Validators;
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
 
 namespace Aton.Infrastructure.Identity.Managers;
@@ -14,9 +15,26 @@ public class AccountManager
         _accountContext = accountContext;
     }
 
+    protected bool ValidateLogin(string login, out ValidationResult validationResult)
+    {
+        validationResult = new LoginValidator().Validate(login);
+        return validationResult.IsValid;
+    }
+    
+    protected bool ValidatePassword(string password, out ValidationResult validationResult)
+    {
+        validationResult = new PasswordValidator().Validate(password);
+        return validationResult.IsValid;
+    }
+
     public async Task<IdentityResult> CreateAsync(Account account)
     {
-        var find = await _accountContext.Accounts.FindAsync(account.Login);
+        if (!ValidateLogin(account.Login, out var validationResult))
+            return new IdentityResult(validationResult.Errors);
+        if (!ValidatePassword(account.Password, out validationResult))
+            return new IdentityResult(validationResult.Errors);
+        
+        var find = await FindByLoginAsync(account.Login);
         if (find != null)
             return new IdentityResult(new IdentityError("Already exists"));
         _accountContext.Accounts.Add(account);
@@ -24,9 +42,22 @@ public class AccountManager
         return new IdentityResult();
     }
 
-    public async Task<Account> FindByLoginAsync(string login)
+    public async Task<IdentityResult> MapToUser(string login, Guid userId)
     {
-        return await _accountContext.Accounts.FindAsync(login);
+        if (!ValidateLogin(login, out var validationResult))
+            return new IdentityResult(validationResult.Errors);
+        
+        var account = await FindByLoginAsync(login);
+        if (account == null)
+            return new IdentityResult(new IdentityError("Account doesn't exists"));
+        account.AccountToUser = new AccountToUser(account.Guid, userId);
+        await _accountContext.SaveChangesAsync();
+        return new IdentityResult();
+    }
+
+    protected async Task<Account> FindByLoginAsync(string login)
+    {
+        return await _accountContext.Accounts.SingleOrDefaultAsync(a=>a.Login.Equals(login));
     }
     
     public async Task<bool> IsAdminAsync(string login)
@@ -35,19 +66,29 @@ public class AccountManager
         return acc.Admin;
     }
 
-    public async Task<Guid?> GetGuid(string login)
+    public async Task<Guid?> GetUserGuid(string login)
     {
-        var atc = await _accountContext.AccountToUser.SingleOrDefaultAsync(atu => atu.AccountLogin.Equals(login));
-        return atc?.UserId;
+        var atc = await _accountContext.Accounts
+            .Include(a => a.AccountToUser)
+            .SingleOrDefaultAsync(a => a.Login.Equals(login));
+        return atc?.AccountToUser.UserId;
     }
 
     public async Task<IdentityResult> ChangeLogin(string login, string newLogin)
     {
-        var account = await FindByLoginAsync(login);
+        if (!ValidateLogin(login, out var validationResult))
+            return new IdentityResult(validationResult.Errors);
+        if (!ValidateLogin(newLogin, out validationResult))
+            return new IdentityResult(validationResult.Errors);
+        
+        var account = _accountContext.Accounts
+            .SingleOrDefault(a=>a.Login.Equals(login));
+        
         if (account == null)
             return new IdentityResult(new IdentityError("Account doesn't exists"));
         if(await _accountContext.Accounts.AnyAsync(a=>a.Login.Equals(newLogin)))
             return new IdentityResult(new IdentityError("Login already taken"));
+        
         account.Login = newLogin;
         await _accountContext.SaveChangesAsync();
         return new IdentityResult();
@@ -55,9 +96,15 @@ public class AccountManager
 
     public async Task<IdentityResult> ChangePassword(string login, string newPassword)
     {
+        if (!ValidateLogin(login, out var validationResult))
+            return new IdentityResult(validationResult.Errors);
+        if (!ValidatePassword(newPassword, out  validationResult))
+            return new IdentityResult(validationResult.Errors);
+        
         var acc = await FindByLoginAsync(login);
         if (acc == null)
             return new IdentityResult(new IdentityError("Account doesn't exists"));
+        
         acc.Password = newPassword;
         await _accountContext.SaveChangesAsync();
         return new IdentityResult();
@@ -70,6 +117,12 @@ public class IdentityResult
     {
         Errors = errors;
     }
+
+    public IdentityResult(IEnumerable<ValidationFailure> vaildationErrors)
+    {
+        Errors = vaildationErrors.Select(v => new IdentityError(v.ErrorMessage));
+    }
+
     public bool IsSuccess => !Errors.Any();
     public IEnumerable<IdentityError> Errors { get; protected set; }
 }
@@ -80,6 +133,5 @@ public class IdentityError
     {
         Description = description;
     }
-
     public string Description { get; protected set; }
 }

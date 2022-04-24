@@ -5,13 +5,32 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Aton.Infrastructure.Data.Contexts;
 
-public class ApplicationDbContext : DbContext
+public sealed class ApplicationDbContext : DbContext
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
+        Database.EnsureCreated();
     }
-    
+
     public DbSet<User> Users { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<User>()
+            .HasData(
+                new User(
+                    Guid.Parse("c6a774c5-8729-454e-b1dc-348a0f220795"),
+                    "Молева Екатерина",
+                    Gender.Male,
+                    DateTime.Parse("1992-04-14")),
+                new User(
+                    Guid.Parse("7940d819-483c-4d27-929a-2879d41c0dad"),
+                    "Козлов Кирилл",
+                    Gender.Male,
+                    DateTime.Parse("1992-04-14"))
+            );
+    }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)
     {

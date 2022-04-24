@@ -29,18 +29,18 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
   
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()  
     {  
-        string username = null;
+        string login = null;
         bool admin = false;
         try  
         {  
             var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);  
             var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader.Parameter)).Split(':');  
-            username = credentials.FirstOrDefault();  
+            login = credentials.FirstOrDefault();  
             var password = credentials.LastOrDefault();  
   
-            if (!_signInManager.ValidateCredentials(username, password))  
+            if (!_signInManager.ValidateCredentials(login, password))  
                 throw new ArgumentException("Invalid credentials");
-            admin = await _accountManager.IsAdminAsync(username);
+            admin = await _accountManager.IsAdminAsync(login);
         }  
         catch (Exception ex)  
         {  
@@ -48,7 +48,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         }  
   
         var claims = new List<Claim> {  
-            new(ClaimTypes.Name, username),
+            new(ClaimTypes.Name, login),
         };  
         
         if(admin)

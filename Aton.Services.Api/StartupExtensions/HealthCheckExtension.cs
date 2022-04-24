@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-
 namespace Aton.Services.Api.StartupExtensions
 {
     public static class HealthCheckExtension

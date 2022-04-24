@@ -1,5 +1,4 @@
 ﻿using Aton.Infrastructure.Identity.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace Aton.Infrastructure.Identity.Managers;
 

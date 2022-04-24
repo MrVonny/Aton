@@ -10,11 +10,6 @@ public class UserRepository : Repository<User>, IUserRepository
     {
     }
 
-    public User GetByLogin(string login)
-    {
-        return DbSet.SingleOrDefault(u => u.Login.Equals(login));
-    }
-
     public IEnumerable<User> GetActiveOrdered()
     {
         return DbSet.Where(u => !u.RevokedAt.HasValue)
