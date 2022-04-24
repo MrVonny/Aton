@@ -9,7 +9,6 @@ using Aton.Infrastructure.Identity.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using IdentityResult = Microsoft.AspNetCore.Identity.IdentityResult;
 
 namespace Aton.Services.Api.Controllers;
 
@@ -20,19 +19,15 @@ public class UserController : ApiController
 {
     private readonly IUserAppService _userAppService;
     private readonly AccountManager _accountManager;
-    private readonly SignInManager _signInManager;
 
     public UserController(
         IUserAppService userAppService,
         INotificationHandler<DomainNotification> notifications,
         IMediatorHandler mediator,
-        AccountManager accountManager,
-        SignInManager signInManager) : base(notifications, mediator)
+        AccountManager accountManager) : base(notifications, mediator)
     {
         _userAppService = userAppService;
         _accountManager = accountManager;
-        _signInManager = signInManager;
-        _accountManager.CurrentUser = GetUserLogin();
     }
 
     [HttpGet]
@@ -104,7 +99,8 @@ public class UserController : ApiController
             createUserViewModel.Login,
             createUserViewModel.Password,
             createUserViewModel.Admin.GetValueOrDefault());
-
+        
+        _accountManager.CurrentUser = GetUserLogin();
         var identityResult = await _accountManager.CreateAsync(account);
 
         if (!identityResult.IsSuccess)
@@ -120,6 +116,7 @@ public class UserController : ApiController
             return Response();
         }
 
+        _accountManager.CurrentUser = GetUserLogin();
         var mapResult = await _accountManager.MapToUser(createUserViewModel.Login, userGuid.Value);
         
         if (!mapResult.IsSuccess)
@@ -143,7 +140,7 @@ public class UserController : ApiController
             NotifyModelStateErrors();
             return Response();
         }
-
+        
         var userGuid = await _accountManager.GetUserGuid(login);
         if (userGuid == null)
         {
@@ -168,6 +165,7 @@ public class UserController : ApiController
             return Response();
         }
 
+        _accountManager.CurrentUser = GetUserLogin();
         var identityResult = await _accountManager.ChangeLogin(login, newLogin);
         if (!identityResult.IsSuccess)
         {
@@ -188,6 +186,7 @@ public class UserController : ApiController
             return Response();
         }
 
+        _accountManager.CurrentUser = GetUserLogin();
         var identityResult =
             await _accountManager.ChangePassword(login, newPassword);
         if (!identityResult.IsSuccess)
@@ -221,6 +220,7 @@ public class UserController : ApiController
 
     private async Task RevokeUser(string login, Guid guid)
     {
+        _accountManager.CurrentUser = GetUserLogin();
         var result = await _accountManager.RevokeAsync(login);
         if (!result.IsSuccess)
         {
@@ -232,6 +232,7 @@ public class UserController : ApiController
     
     private async Task DeleteUser(string login, Guid guid)
     {
+        _accountManager.CurrentUser = GetUserLogin();
         var result = await _accountManager.Remove(login);
         if (!result.IsSuccess)
         {

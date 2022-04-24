@@ -86,12 +86,15 @@ public sealed class ApplicationDbContext : DbContext
 
         foreach (var entry in filtered)
         {
-            if (entry.State == EntityState.Added)
+            switch (entry.State)
             {
-                ((EntityAudit)entry.Entity).CreatedAt = DateTime.UtcNow;
+                case EntityState.Added:
+                    ((EntityAudit)entry.Entity).CreatedAt = DateTime.UtcNow;
+                    break;
+                case EntityState.Modified:
+                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
+                    break;
             }
-
-            ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
         }
     }
 }

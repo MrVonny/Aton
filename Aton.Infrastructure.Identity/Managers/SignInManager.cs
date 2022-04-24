@@ -1,13 +1,11 @@
 ﻿using Aton.Infrastructure.Identity.Data;
+using Microsoft.AspNetCore.Http;
 
 namespace Aton.Infrastructure.Identity.Managers;
 
-public interface IUserService  
-{  
-    bool ValidateCredentials(string username, string password);  
-}  
-public class SignInManager  : IUserService
+public class SignInManager
 {
+    public HttpContext? HttpContext { get; set; }
     private readonly AccountDbContext _accountContext;
 
     public SignInManager(AccountDbContext accountContext)
@@ -20,4 +18,6 @@ public class SignInManager  : IUserService
         var acc = _accountContext.Accounts.SingleOrDefault(a => a.Login.Equals(login));
         return acc != null && acc.Password.Equals(password);
     }
+
+    
 }

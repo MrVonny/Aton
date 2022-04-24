@@ -1,7 +1,9 @@
-﻿using Aton.Infrastructure.Identity.Data;
+﻿using System.Security.Claims;
+using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Models;
 using Aton.Infrastructure.Identity.Validators;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Aton.Infrastructure.Identity.Managers;
@@ -9,11 +11,12 @@ namespace Aton.Infrastructure.Identity.Managers;
 public class AccountManager
 {
     private readonly AccountDbContext _accountContext;
-    public string CurrentUser { get; set; } = null;
+    public string CurrentUser { get; set; }
 
-    public AccountManager(AccountDbContext accountContext)
+    public AccountManager(AccountDbContext accountContext, IHttpContextAccessor httpContextAccessor)
     {
         _accountContext = accountContext;
+        CurrentUser = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
     }
 
     protected bool ValidateLogin(string login, out ValidationResult validationResult)

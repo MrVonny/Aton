@@ -36,7 +36,8 @@ namespace Aton.Domain.CommandHandlers
 
             var user = new User(Guid.NewGuid(), message.Name, message.Gender!.Value, message.Birthday);
             user.CreatedBy = message.CreatedBy;
-
+            user.UpdatedBy = message.CreatedBy;
+            
             if (await _userRepository.GetById(user.Id) != null)
             {
                 await _bus.RaiseEvent(new DomainNotification(message.MessageType, "User is already registered."));

@@ -12,7 +12,7 @@ public class UserRepository : Repository<User>, IUserRepository
 
     public IEnumerable<User> GetActiveOrdered()
     {
-        return DbSet.Where(u => !u.RevokedAt.HasValue)
+        return DbSet.Where(u => !u.RevokedAt.HasValue && !u.RevokedAt.HasValue)
             .OrderBy(u => u.CreatedAt);
     }
 }
