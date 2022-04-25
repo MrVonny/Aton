@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Aton.Application.Interfaces;
 using Aton.Application.ViewModels;
 using Aton.Domain.Core.Bus;
@@ -35,7 +36,7 @@ public class UserController : ApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetActiveOrdered()
     {
-        var active = _userAppService.GetActiveOrdered();
+        var active = await _userAppService.GetActiveOrdered();
         return Response(active);
     }
     
@@ -43,9 +44,15 @@ public class UserController : ApiController
     [Route("older-than/{olderThan:int}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetOlderThan([FromRoute] int? olderThan)
+    public async Task<IActionResult> GetOlderThan([FromRoute, Required] int? olderThan)
     {
-        throw new NotImplementedException();
+        if (!ModelState.IsValid)
+        {
+            NotifyModelStateErrors();
+            return Response();
+        }   
+        var users = await _userAppService.GetOlderThan(olderThan!.Value);
+        return Response(users);
     }
     
     [HttpGet]

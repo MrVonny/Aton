@@ -37,9 +37,9 @@ public class UserAppService : IUserAppService
         throw new NotImplementedException();
     }
 
-    public IEnumerable<UserViewModel> GetActiveOrdered()
+    public async Task<IEnumerable<UserViewModel>> GetActiveOrdered()
     {
-        var active = _userRepository.GetActiveOrdered();
+        var active = await _userRepository.GetActiveOrdered();
         return _mapper.Map<IEnumerable<UserViewModel>>(active);
     }
 
@@ -81,6 +81,12 @@ public class UserAppService : IUserAppService
     {
         var command = new RevokeUserCommand(guid, revokedBy);
         await _bus.SendCommand(command);
+    }
+
+    public async Task<IEnumerable<UserViewModel>> GetOlderThan(int olderThan)
+    {
+        var users = await _userRepository.GetOlderThan(olderThan);
+        return _mapper.Map<IEnumerable<UserViewModel>>(users);
     }
 
 

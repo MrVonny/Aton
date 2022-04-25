@@ -77,6 +77,14 @@ public class AccountManager
             .SingleOrDefaultAsync(a => a.Login.Equals(login));
         return atc?.AccountToUser.UserId;
     }
+    
+    public async Task<string> GetUserLogin(Guid guid)
+    {
+        var atc = await _accountContext.AccountToUser
+            .Include(atu => atu.Account)
+            .SingleOrDefaultAsync(atu => atu.UserId.Equals(guid));
+        return atc?.Account.Login;
+    }
 
     public async Task<IdentityResult> ChangeLogin(string login, string newLogin)
     {

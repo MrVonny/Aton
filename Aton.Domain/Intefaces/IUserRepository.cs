@@ -4,6 +4,7 @@ namespace Aton.Domain.Intefaces
 {
     public interface IUserRepository : IRepository<User>
     {
-        IEnumerable<User> GetActiveOrdered();
+        Task<IEnumerable<User>> GetActiveOrdered();
+        Task<IEnumerable<User>> GetOlderThan(int olderThan);
     }
 }
