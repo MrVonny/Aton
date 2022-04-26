@@ -11,7 +11,7 @@ namespace Aton.Application.AutoMapper
             CreateMap<CreateUserViewModel, CreateUserCommand>()
                 .ConstructUsing(c => new CreateUserCommand(c.Name, c.Gender.Value ,c.Birthday));
             CreateMap<EditUserInfoModel, EditUserCommand>()
-                .ConstructUsing(c => new EditUserCommand(c.Guid.Value, c.Name, c.Gender.Value ,c.Birthday));
+                .ConstructUsing(c => new EditUserCommand(c.Guid.Value, c.Name, c.Gender ,c.Birthday));
         }
     }
 }
