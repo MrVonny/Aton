@@ -1,6 +1,7 @@
 using Aton.Infrastructure.Identity.Data;
 using Aton.Services.Api.Auth;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Aton.Services.Api.StartupExtensions
@@ -10,6 +11,8 @@ namespace Aton.Services.Api.StartupExtensions
         public static IServiceCollection AddCustomizedAuth(this IServiceCollection services,
             IConfiguration configuration)
         {
+            services.AddSingleton<
+                IAuthorizationMiddlewareResultHandler, SampleAuthorizationMiddlewareResultHandler>();
             services.AddDbContext<AccountDbContext>(builder => builder.UseInMemoryDatabase("Aton"));
             services.AddAuthentication("BasicAuthentication")  
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);

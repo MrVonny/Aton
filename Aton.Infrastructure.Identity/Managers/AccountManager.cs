@@ -152,6 +152,14 @@ public class AccountManager
         await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
+
+    public async Task<bool> IsActiveAsync(string login)
+    {
+        var acc = await FindByLoginAsync(login);
+        if (acc == null)
+            return false;
+        return !acc.RevokedAt.HasValue;
+    }
 }
 
 public class IdentityResult

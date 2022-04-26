@@ -46,6 +46,11 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
             {
                 throw new InvalidOperationException("Invalid credentials");
             }
+
+            if (!await _accountManager.IsActiveAsync(login))
+            {
+                throw new InvalidOperationException("Your account has been revoked");
+            }
                 
             admin = await _accountManager.IsAdminAsync(login);
         }
@@ -69,10 +74,10 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         return AuthenticateResult.Success(ticket);  
     }
 
-    protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
-    {
-        //Context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-        var message = $"Authentication failed: {FailureReason}";
-        await Context.Response.WriteAsync(message);
-    }
+    // protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+    // {
+    //     //Context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+    //     var message = $"Authentication failed: {FailureReason}";
+    //     await Context.Response.WriteAsync(message);
+    // }
 }  

@@ -35,6 +35,7 @@ public class UserController : ApiController
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin")]
     [Route("active")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetActiveOrdered()
@@ -45,6 +46,7 @@ public class UserController : ApiController
     
     [HttpGet]
     [Route("older-than/{olderThan:int}")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetOlderThan([FromRoute, Required] int? olderThan)
@@ -57,27 +59,26 @@ public class UserController : ApiController
         var users = await _userAccountConnector.GetOlderThan(olderThan!.Value);
         return Response(users);
     }
-    
+
     [HttpGet]
     [Route("{login}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetByLogin([FromRoute] string login)
     {
-        if (IsUserAdmin() || GetUserLogin() == login)
+        if (!IsUserAdmin() && GetUserLogin() != login)
+            return Forbid();
+
+        var user = await _userAccountConnector.GetByLogin(login);
+        if (user == null)
         {
-            var user = await _userAccountConnector.GetByLogin(login);
-            if (user == null)
-            {
-                NotifyError(string.Empty,"Can't find user");
-                return Response();
-            }
-            return Response(user);
+            NotifyError(string.Empty, "Can't find user");
+            return Response();
         }
-        NotifyError("","Forbidden");
-        return Response();
+
+        return Response(user);
     }
-    
+
     [HttpGet]
     [Route("me")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -148,6 +149,9 @@ public class UserController : ApiController
         [FromQuery] Gender? gender = null,
         [FromQuery] DateTime? birthday = null)
     {
+        if (!IsUserAdmin() && GetUserLogin() != login)
+            return Forbid();
+
         if (!ModelState.IsValid)
         {
             NotifyModelStateErrors();
@@ -172,6 +176,9 @@ public class UserController : ApiController
     [Route("{login}/login")]
     public async Task<IActionResult> UpdateLogin([FromRoute(Name = "login")] string login, [FromQuery] string newLogin)
     {
+        if (!IsUserAdmin() && GetUserLogin() != login)
+            return Forbid();
+        
         if (!ModelState.IsValid)
         {
             NotifyModelStateErrors();
@@ -275,5 +282,4 @@ public class UserController : ApiController
     {
         return HttpContext.User.FindFirst(ClaimTypes.Role)?.Value == "Admin";
     }
-
 }
