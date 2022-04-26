@@ -1,5 +1,8 @@
+using System.Security.Claims;
 using Aton.Infrastructure.Identity.Data;
+using Aton.Infrastructure.Identity.Managers;
 using Aton.Services.Api.Auth;
+using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -11,11 +14,68 @@ namespace Aton.Services.Api.StartupExtensions
         public static IServiceCollection AddCustomizedAuth(this IServiceCollection services,
             IConfiguration configuration)
         {
-            services.AddSingleton<
-                IAuthorizationMiddlewareResultHandler, SampleAuthorizationMiddlewareResultHandler>();
+            services.AddSingleton<IAuthorizationMiddlewareResultHandler, SampleAuthorizationMiddlewareResultHandler>();
             services.AddDbContext<AccountDbContext>(builder => builder.UseInMemoryDatabase("Aton"));
-            services.AddAuthentication("BasicAuthentication")  
-                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
+            services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
+                .AddBasic(options =>
+                {
+                    options.SuppressWWWAuthenticateHeader = true;
+                    options.AllowInsecureProtocol = true;
+                    options.Realm = "basic";
+                    options.Events = new BasicAuthenticationEvents
+                    {
+                        OnValidateCredentials = async context =>
+                        {
+                            var signInManager =
+                                context.HttpContext.RequestServices.GetService<SignInManager>();
+                            var accountManager =
+                                context.HttpContext.RequestServices.GetService<AccountManager>();
+                            
+                            bool admin = false;
+                            try
+                            {
+                                if (!signInManager.ValidateCredentials(context.Username, context.Password))
+                                {
+                                    context.Fail("Invalid credentials");
+                                    return;
+                                }
+
+                                if (!await accountManager.IsActiveAsync(context.Username))
+                                {
+                                    context.Fail("Your account has been revoked");
+                                    return;
+                                }
+                
+                                admin = await accountManager.IsAdminAsync(context.Username);
+                            }
+                            catch (InvalidOperationException ex)
+                            {
+                                context.Fail(ex);
+                                return;
+                            }
+                            
+                            var claims = new List<Claim>()
+                            {
+                                new (
+                                    ClaimTypes.Name, 
+                                    context.Username, 
+                                    ClaimValueTypes.String, 
+                                    context.Options.ClaimsIssuer),
+                            };
+                            
+                            if(admin)
+                                claims.Add(new (
+                                    ClaimTypes.Role, 
+                                    "Admin", 
+                                    ClaimValueTypes.String, 
+                                    context.Options.ClaimsIssuer));
+
+                            context.Principal = new ClaimsPrincipal(
+                                new ClaimsIdentity(claims, context.Scheme.Name));
+                            context.Success();
+                        }
+                    };
+                });
             return services;
         }
         // public static IServiceCollection AddCustomizedAuth(this IServiceCollection services, IConfiguration configuration)

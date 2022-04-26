@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace Aton.Services.Api.Auth;
 
 public class SampleAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewareResultHandler
 {
-    private readonly AuthorizationMiddlewareResultHandler  defaultHandler = new();
+    private readonly AuthorizationMiddlewareResultHandler  _defaultHandler = new();
 
     public async Task HandleAsync(
         RequestDelegate next,
@@ -16,20 +17,20 @@ public class SampleAuthorizationMiddlewareResultHandler : IAuthorizationMiddlewa
         if (authorizeResult.Challenged)
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-            if (authorizeResult.AuthorizationFailure != null)
-                await context.Response.WriteAsync(string.Join("\n",
-                    authorizeResult.AuthorizationFailure?.FailureReasons.Select(x => x.Message)));
+            context.Response.ContentType = System.Net.Mime.MediaTypeNames.Text.Plain;
+            await context.Response.WriteAsync("Wrong username/password or your account is blocked");
             return;
         }
 
         if (authorizeResult.Forbidden)
         {
-            // Return a 404 to make it appear as if the resource doesn't exist.
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            context.Response.ContentType = System.Net.Mime.MediaTypeNames.Text.Plain;
+            await context.Response.WriteAsync("You don't have enough rights");
             return;
         }
 
         // Fall back to the default implementation.
-        await defaultHandler.HandleAsync(next, context, policy, authorizeResult);
+        await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
     }
 }
