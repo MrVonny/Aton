@@ -12,6 +12,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     #region Property  
     readonly SignInManager _signInManager;
     private readonly AccountManager _accountManager;
+    protected string FailureReason { get; set; }
     #endregion  
  
     #region Constructor  
@@ -28,25 +29,32 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
     #endregion  
   
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()  
-    {  
+    {
         string login = null;
         bool admin = false;
-        try  
-        {  
+        try
+        {
+            if (!Request.Headers["Authorization"].Any())
+                throw new InvalidOperationException("Authorization header missing");
+            
             var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);  
             var credentials = Encoding.UTF8.GetString(Convert.FromBase64String(authHeader.Parameter)).Split(':');  
             login = credentials.FirstOrDefault();  
-            var password = credentials.LastOrDefault();  
-  
-            if (!_signInManager.ValidateCredentials(login, password))  
-                throw new ArgumentException("Invalid credentials");
+            var password = credentials.LastOrDefault();
+
+            if (!_signInManager.ValidateCredentials(login, password))
+            {
+                throw new InvalidOperationException("Invalid credentials");
+            }
+                
             admin = await _accountManager.IsAdminAsync(login);
-        }  
-        catch (Exception ex)  
-        {  
-            return AuthenticateResult.Fail($"Authentication failed: {ex.Message}");  
-        }  
-  
+        }
+        catch (InvalidOperationException ex)
+        {
+            FailureReason = ex.Message;
+            return AuthenticateResult.Fail(FailureReason);  
+        }
+
         var claims = new List<Claim> {  
             new(ClaimTypes.Name, login),
         };  
@@ -59,6 +67,12 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
         var ticket = new AuthenticationTicket(principal, Scheme.Name);  
   
         return AuthenticateResult.Success(ticket);  
-    }  
-  
+    }
+
+    protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+    {
+        //Context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+        var message = $"Authentication failed: {FailureReason}";
+        await Context.Response.WriteAsync(message);
+    }
 }  
