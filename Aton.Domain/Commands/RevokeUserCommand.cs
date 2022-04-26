@@ -2,7 +2,7 @@
 
 namespace Aton.Domain.Commands;
 
-public class RevokeUserCommand : UserCommand
+public class RevokeUserCommand : UserCommand<bool>
 {
     public RevokeUserCommand(Guid guid, string revokedBy)
     {

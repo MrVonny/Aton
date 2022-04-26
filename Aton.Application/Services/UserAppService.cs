@@ -3,6 +3,7 @@ using Aton.Application.ViewModels;
 using Aton.Domain.Commands;
 using Aton.Domain.Core.Bus;
 using Aton.Domain.Intefaces;
+using Aton.Domain.Models;
 using AutoMapper;
 
 namespace Aton.Application.Services;
@@ -12,8 +13,6 @@ public class UserAppService : IUserAppService
     private readonly IMapper _mapper;
     private readonly IUserRepository _userRepository;
     private readonly IMediatorHandler _bus;
-    
-    public string CurrentUser { get; set; }
 
     public UserAppService(IMapper mapper,
         IUserRepository userRepository,
@@ -87,6 +86,12 @@ public class UserAppService : IUserAppService
     {
         var users = await _userRepository.GetOlderThan(olderThan);
         return _mapper.Map<IEnumerable<UserViewModel>>(users);
+    }
+
+    public async Task Restore(Guid guid)
+    {
+        var command = new RestoreUserCommand(guid);
+        await _bus.SendCommand(command);
     }
 
 

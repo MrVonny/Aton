@@ -7,6 +7,7 @@ using Aton.Domain.Core.Notifications;
 using Aton.Domain.Models;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Infrastructure.Identity.Models;
+using Aton.Services.Api.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,15 +21,17 @@ public class UserController : ApiController
 {
     private readonly IUserAppService _userAppService;
     private readonly AccountManager _accountManager;
+    private readonly IUserAccountConnector _userAccountConnector;
 
     public UserController(
         IUserAppService userAppService,
         INotificationHandler<DomainNotification> notifications,
         IMediatorHandler mediator,
-        AccountManager accountManager) : base(notifications, mediator)
+        AccountManager accountManager, IUserAccountConnector userAccountConnector) : base(notifications, mediator)
     {
         _userAppService = userAppService;
         _accountManager = accountManager;
+        _userAccountConnector = userAccountConnector;
     }
 
     [HttpGet]
@@ -36,7 +39,7 @@ public class UserController : ApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetActiveOrdered()
     {
-        var active = await _userAppService.GetActiveOrdered();
+        var active = await _userAccountConnector.GetActiveOrdered();
         return Response(active);
     }
     
@@ -51,7 +54,7 @@ public class UserController : ApiController
             NotifyModelStateErrors();
             return Response();
         }   
-        var users = await _userAppService.GetOlderThan(olderThan!.Value);
+        var users = await _userAccountConnector.GetOlderThan(olderThan!.Value);
         return Response(users);
     }
     
@@ -63,16 +66,12 @@ public class UserController : ApiController
     {
         if (IsUserAdmin() || GetUserLogin() == login)
         {
-            var guid =
-                await _accountManager.GetUserGuid(login);
-            if (guid == null)
+            var user = await _userAccountConnector.GetByLogin(login);
+            if (user == null)
             {
                 NotifyError(string.Empty,"Can't find user");
                 return Response();
             }
-
-            var user = await _userAppService.GetById(guid.Value);
-        
             return Response(user);
         }
         NotifyError("","Forbidden");
@@ -84,8 +83,15 @@ public class UserController : ApiController
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Me()
     {
-        var login = GetUserLogin();
-        return await GetByLogin(login);
+        var user = await _userAccountConnector.GetByLogin(GetUserLogin());
+        
+        if (user == null)
+        {
+            NotifyError(string.Empty,"Can't find user");
+            return Response();
+        }
+
+        return Response(user);
     }
     
     
@@ -204,52 +210,62 @@ public class UserController : ApiController
         
         return Response();
     }
+    
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    [Route("{login}/restore")]
+    public async Task<IActionResult> Restore([FromRoute(Name = "login"), Required] string login)
+    {
+        if (!ModelState.IsValid)
+        {
+            NotifyModelStateErrors();
+            return Response();
+        }
+
+        var restoreResult = await _accountManager.RestoreAsync(login);
+        if (!restoreResult.IsSuccess)
+        {
+            AddIdentityErrors(restoreResult);
+            return Response();
+        }
+        
+        var userGuid = await _accountManager.GetUserGuid(login);
+        if (userGuid == null)
+        {
+            NotifyError(string.Empty, "User doesn't exists");
+            return Response();
+        }
+
+        await _userAppService.Restore(userGuid.Value);
+
+        return Response();
+    }
 
     [HttpDelete]
     [Authorize(Roles = "Admin")]
     [Route("{login}")]
     public async Task<IActionResult> Delete([FromRoute(Name = "login")] string login, [FromQuery] bool soft = true)
     {
-        var guid = await _accountManager.GetUserGuid(login);
-        if (guid == null)
-        {
-            NotifyError(string.Empty,"Can't find user");
-            return Response();
-        }
-
         if (soft)
-            await RevokeUser(login, guid.Value);
+            await RevokeUser(login);
         else
-            await DeleteUser(login, guid.Value);
+            await DeleteUser(login);
 
         return Response();
     }
 
-    private async Task RevokeUser(string login, Guid guid)
+    private async Task RevokeUser(string login)
     {
-        _accountManager.CurrentUser = GetUserLogin();
-        var result = await _accountManager.RevokeAsync(login);
-        if (!result.IsSuccess)
-        {
-            AddIdentityErrors(result);
-            return;
-        }
-        await _userAppService.Revoke(guid, GetUserLogin());
+        _userAccountConnector.CurrentUser = GetUserLogin();
+        await _userAccountConnector.Revoke(login);
     }
     
-    private async Task DeleteUser(string login, Guid guid)
+    private async Task DeleteUser(string login)
     {
-        _accountManager.CurrentUser = GetUserLogin();
-        var result = await _accountManager.Remove(login);
-        if (!result.IsSuccess)
-        {
-            AddIdentityErrors(result);
-            return;
-        }
-        _userAppService.Remove(guid);
+        _userAccountConnector.CurrentUser = GetUserLogin();
+        await _userAccountConnector.Delete(login);
     }
     
-
     private string GetUserLogin()
     {
         return HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
@@ -259,7 +275,5 @@ public class UserController : ApiController
     {
         return HttpContext.User.FindFirst(ClaimTypes.Role)?.Value == "Admin";
     }
-    
-  
 
 }

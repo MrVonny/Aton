@@ -127,6 +127,7 @@ public class AccountManager
         if (acc == null)
             return new IdentityResult(new IdentityError("Account doesn't exists"));
         acc.RevokedAt = DateTime.Now;
+        acc.RevokedBy = CurrentUser;
         await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
@@ -137,6 +138,17 @@ public class AccountManager
         if (acc == null)
             return new IdentityResult(new IdentityError("Account doesn't exists"));
         _accountContext.Remove(acc);
+        await _accountContext.SaveChangesWithUserAsync(CurrentUser);
+        return new IdentityResult();
+    }
+
+    public async Task<IdentityResult> RestoreAsync(string login)
+    {
+        var acc = await FindByLoginAsync(login);
+        if (acc == null)
+            return new IdentityResult(new IdentityError("Account doesn't exists"));
+        acc.RevokedAt = null;
+        acc.RevokedBy = null;
         await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }

@@ -10,7 +10,8 @@ namespace Aton.Domain.CommandHandlers
     public class UserCommandHandler : CommandHandler,
         IRequestHandler<CreateUserCommand, User>,
         IRequestHandler<EditUserCommand, User>,
-        IRequestHandler<RevokeUserCommand, bool>
+        IRequestHandler<RevokeUserCommand, bool>,
+        IRequestHandler<RestoreUserCommand, bool>
 
     {
         private readonly IUserRepository _userRepository;
@@ -98,6 +99,29 @@ namespace Aton.Domain.CommandHandlers
 
             user.RevokedBy = message.RevokedBy;
             user.RevokedAt = DateTime.Now;
+
+            Commit();
+
+            return true;
+        }
+
+        public async Task<bool> Handle(RestoreUserCommand message, CancellationToken cancellationToken)
+        {
+            if (!message.IsValid())
+            {
+                NotifyValidationErrors(message);
+                return false;
+            }
+
+            var user = await _userRepository.GetById(message.Id);
+            if (user == null)
+            {
+                await _bus.RaiseEvent(new DomainNotification(message.MessageType, $"User with Guid {message.Id} doesn't exists"));
+                return false;
+            }
+
+            user.RevokedBy = null;
+            user.RevokedAt = null;
 
             Commit();
 

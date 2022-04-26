@@ -5,7 +5,6 @@ namespace Aton.Infrastructure.Identity.Managers;
 
 public class SignInManager
 {
-    public HttpContext? HttpContext { get; set; }
     private readonly AccountDbContext _accountContext;
 
     public SignInManager(AccountDbContext accountContext)

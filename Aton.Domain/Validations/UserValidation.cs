@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Aton.Domain.Validations;
 
-public class UserValidation <T> : AbstractValidator<T> where T : UserCommand
+public class UserValidation <T> : AbstractValidator<T> where T : IUserCommand
 {
     protected readonly T Object;
 

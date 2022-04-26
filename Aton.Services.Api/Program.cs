@@ -2,6 +2,7 @@ using System.Reflection;
 using Aton.Infrastructure.IoC;
 using Aton.Services.Api.Configurations;
 using Aton.Services.Api.Filters;
+using Aton.Services.Api.Services;
 using Aton.Services.Api.StartupExtensions;
 using MediatR;
 using Microsoft.OpenApi.Models;
@@ -57,6 +58,8 @@ services.AddAutoMapperSetup();
 services.AddMediatR(Assembly.GetExecutingAssembly());
 
 services.AddCustomizedHash(builder.Configuration);
+
+services.AddScoped<IUserAccountConnector, UserAccountConnector>();
 
 
 // ----- Health check -----

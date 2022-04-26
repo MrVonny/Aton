@@ -3,7 +3,7 @@ using Aton.Domain.Validations;
 
 namespace Aton.Domain.Commands;
 
-public class CreateUserCommand : UserCommand
+public class CreateUserCommand : UserCommand<User>
 {
     public string CreatedBy { get; set; }
     public CreateUserCommand(string name, Gender gender , DateTime? birthday = null)

@@ -1,11 +1,11 @@
 ﻿using Aton.Domain.Models;
 
-namespace Aton.Application.ViewModels;
+namespace Aton.Services.Api.ViewModels;
 
-public class UserViewModel
+public class AspUserViewModel
 {
-    public Guid Guid { get; set; }
     public string Name { get; set; }
+    public string Login { get; set; }
     public Gender Gender { get; set; }
     public DateTime? Birthday { get; set; }
     public DateTime CreatedAt { get; set; }

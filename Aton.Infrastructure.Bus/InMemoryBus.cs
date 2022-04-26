@@ -26,6 +26,11 @@ public class InMemoryBus : IMediatorHandler
         return await _mediator.Send((IRequest<T>)command);
     }
 
+    public async Task<bool> SendCommand(Command<bool> command)
+    {
+        return await _mediator.Send((IRequest<bool>)command);
+    }
+
     public Task RaiseEvent<T>(T @event) where T : Event
     {
         // if (!@event.MessageType.Equals("DomainNotification"))

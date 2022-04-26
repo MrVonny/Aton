@@ -3,7 +3,7 @@ using Aton.Domain.Validations;
 
 namespace Aton.Domain.Commands;
 
-public class EditUserCommand : UserCommand
+public class EditUserCommand : UserCommand<User>
 {
     public string UpdatedBy { get; set; }
     public EditUserCommand(Guid id, string name = null, Gender? gender = null, DateTime? birthday = null)

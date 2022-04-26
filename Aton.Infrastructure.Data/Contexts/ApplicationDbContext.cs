@@ -90,6 +90,7 @@ public sealed class ApplicationDbContext : DbContext
             {
                 case EntityState.Added:
                     ((EntityAudit)entry.Entity).CreatedAt = DateTime.UtcNow;
+                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
                     break;
                 case EntityState.Modified:
                     ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;

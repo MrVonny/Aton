@@ -8,7 +8,9 @@ namespace Aton.Application.AutoMapper
     {
         public DomainToViewModelMappingProfile()
         {
-            CreateMap<User, UserViewModel>();
+            CreateMap<User, UserViewModel>()
+                .ForMember(u=>u.Guid,
+                    u=>u.MapFrom(x=>x.Id));
         }
     }
 }

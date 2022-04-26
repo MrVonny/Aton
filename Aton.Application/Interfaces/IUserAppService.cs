@@ -15,4 +15,5 @@ public interface IUserAppService : IDisposable
     IList<UserViewModel> GetAllHistory(Guid id);
     Task Revoke(Guid guid, string revokedBy);
     Task<IEnumerable<UserViewModel>> GetOlderThan(int olderThan);
+    Task Restore(Guid guid);
 }
