@@ -55,4 +55,41 @@ public class DeleteUserTests : TestBase
                     .AssertStatusCode(HttpStatusCode.BadRequest)
             .Client.Tasks.RunAsync();
     }
+    
+    [Test]
+    public async Task DeleteNonExistentUserBadRequest()
+    {
+        await Client
+            .Auth
+                .LoginAsAdmin()
+            .UserController
+                .DeleteUser("RandomLogin", false)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.BadRequest)
+            .Client.Tasks.RunAsync();
+    }
+    
+    [Test]
+    public async Task DeletedUserCantUseAuth()
+    {
+        var user = UserStorage.GenerateValidUserViewModel;
+        await Client
+            .Auth
+                .LoginAsAdmin()
+            .UserController
+                .CreateUser(user)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.UserController
+                .DeleteUser(user.Login, true)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.Auth
+                .FromUserNameAndPassword(user.Login, user.Password)
+            .UserController
+                .GetMe()
+                .Response
+                    .AssertStatusCode(HttpStatusCode.Unauthorized)
+            .Client.Tasks.RunAsync();
+    }
 }
