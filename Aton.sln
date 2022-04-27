@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aton.Application.UnitTests"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{57273D3D-C7AE-46C7-9A82-9CCE8F12B957}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aton.Application.IntegrationTests", "Aton.Application.IntegrationTests\Aton.Application.IntegrationTests.csproj", "{B422B37E-2E4C-42C0-A256-DCD878CD8027}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aton.Application.IntegrationTests.Cases", "Aton.Application.IntegrationTests.Cases\Aton.Application.IntegrationTests.Cases.csproj", "{B422B37E-2E4C-42C0-A256-DCD878CD8027}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{6BCA7A61-B8C7-4B0C-AEAE-F8A8BAA0EF25}"
 EndProject
@@ -31,6 +31,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aton.Infrastructure.Bus", "Aton.Infrastructure.Bus\Aton.Infrastructure.Bus.csproj", "{25833D36-F207-45FF-99A7-2DE96C2FF3DC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aton.Infrastructure.IoC", "Aton.Infrastructure.IoC\Aton.Infrastructure.IoC.csproj", "{21B2E789-117F-411E-B8DA-C33C6C53DE56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aton.Application.IntegrationTests.Framework", "Aton.Application.IntegrationTests.Framework\Aton.Application.IntegrationTests.Framework.csproj", "{635304EE-0797-49DE-98C6-182B3E4A7D08}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -78,6 +80,10 @@ Global
 		{21B2E789-117F-411E-B8DA-C33C6C53DE56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21B2E789-117F-411E-B8DA-C33C6C53DE56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21B2E789-117F-411E-B8DA-C33C6C53DE56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{635304EE-0797-49DE-98C6-182B3E4A7D08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{635304EE-0797-49DE-98C6-182B3E4A7D08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{635304EE-0797-49DE-98C6-182B3E4A7D08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{635304EE-0797-49DE-98C6-182B3E4A7D08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C9865BA5-3B0C-417F-B59B-71A5FFC46312} = {57273D3D-C7AE-46C7-9A82-9CCE8F12B957}
@@ -94,5 +100,6 @@ Global
 		{4C1D0471-CCA3-4064-AE50-CD3D751DBCC4} = {4FE6147C-80ED-4607-8127-AB5F00BED173}
 		{25833D36-F207-45FF-99A7-2DE96C2FF3DC} = {4FE6147C-80ED-4607-8127-AB5F00BED173}
 		{21B2E789-117F-411E-B8DA-C33C6C53DE56} = {4FE6147C-80ED-4607-8127-AB5F00BED173}
+		{635304EE-0797-49DE-98C6-182B3E4A7D08} = {57273D3D-C7AE-46C7-9A82-9CCE8F12B957}
 	EndGlobalSection
 EndGlobal

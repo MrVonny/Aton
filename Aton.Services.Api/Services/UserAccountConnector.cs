@@ -75,7 +75,7 @@ public class UserAccountConnector : IUserAccountConnector
         return await GetAspViewModels(users);
     }
 
-    public async Task<AspUserViewModel> GetByLogin(string login)
+    public async Task<AspUserViewModel>  GetByLogin(string login)
     {
         var guid = await _accountManager.GetUserGuid(login);
         if (guid == null)

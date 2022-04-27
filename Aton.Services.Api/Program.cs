@@ -17,7 +17,7 @@ services.AddEndpointsApiExplorer();
 services.AddSwaggerGen(c =>  
 {  
     c.SchemaFilter<SwaggerIgnoreFilter>();
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "BasicAuth", Version = "v1" });  
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Aton", Version = "v1" });  
     c.AddSecurityDefinition("basic", new OpenApiSecurityScheme  
     {  
         Name = "Authorization",  
@@ -97,3 +97,5 @@ app.UseEndpoints(endpoints =>
 });
 
 app.Run();
+
+public partial class Program { }
