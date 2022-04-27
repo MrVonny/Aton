@@ -127,6 +127,7 @@ public class UserController : ApiController
 
         if (userGuid == null)
         {
+            await _accountManager.Remove(createUserViewModel.Login);
             return Response();
         }
 
