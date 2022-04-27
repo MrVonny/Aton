@@ -66,9 +66,10 @@ public class UserAppService : IUserAppService
         throw new NotImplementedException();
     }
 
-    public void Remove(Guid id)
+    public async Task Remove(Guid id)
     {
-        throw new NotImplementedException();
+        var command = new DeleteUserCommand(id);
+        await _bus.SendCommand(command);
     }
 
     public IList<UserViewModel> GetAllHistory(Guid id)

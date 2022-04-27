@@ -45,6 +45,7 @@ namespace Aton.Infrastructure.IoC
             services.AddScoped<IRequestHandler<EditUserCommand, User>, UserCommandHandler>();
             services.AddScoped<IRequestHandler<RevokeUserCommand, bool>, UserCommandHandler>();
             services.AddScoped<IRequestHandler<RestoreUserCommand, bool>, UserCommandHandler>();
+            services.AddScoped<IRequestHandler<DeleteUserCommand, bool>, UserCommandHandler>();
 
             // Domain - 3rd parties
             // services.AddScoped<IHttpService, HttpService>();

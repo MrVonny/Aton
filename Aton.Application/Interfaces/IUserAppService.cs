@@ -11,7 +11,7 @@ public interface IUserAppService : IDisposable
     Task<UserViewModel> Edit(EditUserInfoModel editUserInfoModel, string updatedBy);
     Task<UserViewModel> GetById(Guid id);
     void Update(UserViewModel userViewModel);
-    void Remove(Guid id);
+    Task Remove(Guid id);
     IList<UserViewModel> GetAllHistory(Guid id);
     Task Revoke(Guid guid, string revokedBy);
     Task<IEnumerable<UserViewModel>> GetOlderThan(int olderThan);
