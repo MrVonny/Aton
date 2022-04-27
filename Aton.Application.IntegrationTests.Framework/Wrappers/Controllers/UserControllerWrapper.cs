@@ -11,7 +11,7 @@ public class UserControllerWrapper : BaseWrapper
         
     }
 
-    public ResponseWrapper Response => new(Client);
+    public ResponseWrapper.ResponseWrapper Response => new(Client);
 
     public UserControllerWrapper GetActive()
     {

@@ -1,4 +1,5 @@
 ﻿using Aton.Application.IntegrationTests.Framework.Wrappers;
+using Aton.Application.IntegrationTests.Framework.Wrappers.AuthWrapper;
 using Aton.Application.IntegrationTests.Framework.Wrappers.Controllers;
 
 namespace Aton.Application.IntegrationTests.Framework.Facades;

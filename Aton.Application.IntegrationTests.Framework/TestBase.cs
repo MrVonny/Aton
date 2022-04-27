@@ -14,15 +14,14 @@ namespace Aton.Application.IntegrationTests.Framework;
 [TestFixture]
 public abstract class TestBase
 {
-    private readonly WebApplicationFactory<Program> _application;
-    private HttpClient _client;
+    private readonly HttpClient _client;
 
-    public ClientFacade Client => new ClientFacade(_client);
+    protected ClientFacade Client => new ClientFacade(_client);
 
-    public TestBase()
+    protected TestBase()
     {
         var randomDbName = Guid.NewGuid().ToString();
-        _application = new WebApplicationFactory<Program>()
+        var application = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
                 builder.ConfigureServices(async services =>
@@ -64,7 +63,7 @@ public abstract class TestBase
                 });
             });
 
-        _client = _application.CreateClient();
+        _client = application.CreateClient();
         
     }
 }
