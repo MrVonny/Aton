@@ -51,24 +51,22 @@ public sealed class AccountDbContext : DbContext
                     true)
                 {
                     Id = Guid.NewGuid()
-                },
-                acc1,
-                acc2);
-
-        modelBuilder.Entity<AccountToUser>()
-            .HasData(
-                new AccountToUser()
-                {
-                    AccountId = acc1.Id,
-                    UserId = Guid.Parse("c6a774c5-8729-454e-b1dc-348a0f220795"),
-                    Guid = Guid.NewGuid()
-                },
-                new AccountToUser()
-                {
-                    AccountId = acc2.Id,
-                    UserId = Guid.Parse("7940d819-483c-4d27-929a-2879d41c0dad"),
-                    Guid = Guid.NewGuid()
                 });
+
+        // modelBuilder.Entity<AccountToUser>()
+        //     .HasData(
+        //         new AccountToUser()
+        //         {
+        //             AccountId = acc1.Id,
+        //             UserId = Guid.Parse("c6a774c5-8729-454e-b1dc-348a0f220795"),
+        //             Guid = Guid.NewGuid()
+        //         },
+        //         new AccountToUser()
+        //         {
+        //             AccountId = acc2.Id,
+        //             UserId = Guid.Parse("7940d819-483c-4d27-929a-2879d41c0dad"),
+        //             Guid = Guid.NewGuid()
+        //         });
     }
     
     public async Task<int> SaveChangesWithUserAsync(string user = null)
