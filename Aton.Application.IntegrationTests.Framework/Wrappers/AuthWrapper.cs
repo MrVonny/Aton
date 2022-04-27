@@ -45,4 +45,13 @@ public class AuthWrapper : BaseWrapper
         }); 
         return Client;
     }
+
+    public ClientFacade Clear()
+    {
+        Client.Tasks.AddTask(async () =>
+        {
+            Client.HttpClient.DefaultRequestHeaders.Authorization = null;
+        }); 
+        return Client;
+    }
 }

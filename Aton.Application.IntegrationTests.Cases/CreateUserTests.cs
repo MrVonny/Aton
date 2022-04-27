@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
 using Aton.Application.IntegrationTests.Framework;
@@ -8,9 +8,8 @@ using NUnit.Framework;
 
 namespace Aton.Application.IntegrationTests.Cases;
 
-public class AuthorizationSmokeTest : TestBase
+public class CreateUserTests : TestBase
 {
-
     private static CreateUserViewModel ValidUser => new CreateUserViewModel()
     {
         Name = "Козлов Кирилл",
@@ -21,61 +20,68 @@ public class AuthorizationSmokeTest : TestBase
         Birthday = DateTime.Parse("1999-04-01")
     };
     
-    [Test]
-    public async Task ReturnsUnauthorizedWhenNoCredentials()
+    private static CreateUserViewModel InvalidUser => new CreateUserViewModel()
     {
-        await Client
-            .Auth
-                .Clear()
-            .UserController
-                .GetMe()
-                .Response
-                    .AssertStatusCode(HttpStatusCode.Unauthorized)
-            .Client.Tasks.RunAsync();
-    }
+        Name = "Новиков Генадий",
+        Login = "Tri",
+        Password = "10",
+        Admin = false,
+        Gender = Gender.Male,
+        Birthday = DateTime.Parse("1999-04-01")
+    };
     
     [Test]
-    public async Task ReturnsOkForAdmin()
+    public async Task CreateUserTest()
     {
         await Client
             .Auth
                 .LoginAsAdmin()
-            .UserController
-                .GetActive()
-                .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
-            .Client.Tasks.RunAsync();
-    }
-    
-    [Test]
-    public async Task ReturnsOkForUser()
-    {
-        await Client
-            .Auth
-                .LoginAsAdmin()
+            //Create User
             .UserController
                 .CreateUser(ValidUser)
                 .Response
                     .AssertStatusCode(HttpStatusCode.OK)
-            .Client.Auth
-                .FromUserNameAndPassword(ValidUser.Login, ValidUser.Password)
-            .UserController
-                .GetMe()
+            //Get this user
+            .Client.UserController
+                .GetUser(ValidUser.Login)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertProperty("login", ValidUser.Login)
+                    .AssertProperty("createdBy", "Admin")
+                    .AssertProperty("name", ValidUser.Name)
+            //Create duplicate
+            .Client.UserController
+                .CreateUser(ValidUser)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.BadRequest)
             .Client.Tasks.RunAsync();
     }
     
     [Test]
-    public async Task ReturnsForbiddenForUser()
+    public async Task CreateUserFromInvalidDataTest()
+    {
+        await Client
+            .Auth
+                .LoginAsAdmin()
+            .UserController
+                .CreateUser(InvalidUser)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.BadRequest)
+            .Client.Tasks.RunAsync();
+    }
+    
+    
+    [Test]
+    public async Task DefaultUserCantCreateUserTest()
     {
         await Client
             .Auth
                 .LoginAsDefaultUser()
+            //Create User
             .UserController
-                .GetActive()
+                .CreateUser(ValidUser)
                 .Response
                     .AssertStatusCode(HttpStatusCode.Forbidden)
             .Client.Tasks.RunAsync();
+        
     }
 }

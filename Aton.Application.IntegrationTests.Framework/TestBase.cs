@@ -21,6 +21,7 @@ public abstract class TestBase
 
     public TestBase()
     {
+        var randomDbName = Guid.NewGuid().ToString();
         _application = new WebApplicationFactory<Program>()
             .WithWebHostBuilder(builder =>
             {
@@ -32,7 +33,7 @@ public abstract class TestBase
                     services.Remove(descriptor);
                     services.AddDbContext<ApplicationDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("AtonDbForTesting");
+                        options.UseInMemoryDatabase(randomDbName);
                     });
                     
                     descriptor = services.SingleOrDefault(
@@ -41,7 +42,7 @@ public abstract class TestBase
                     services.Remove(descriptor);
                     services.AddDbContext<AccountDbContext>(options =>
                     {
-                        options.UseInMemoryDatabase("IdentityDbForTesting");
+                        options.UseInMemoryDatabase(randomDbName);
                     });
 
                     var sp = services.BuildServiceProvider();
