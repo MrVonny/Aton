@@ -75,7 +75,7 @@ public class AccountManager
         var atc = await _accountContext.Accounts
             .Include(a => a.AccountToUser)
             .SingleOrDefaultAsync(a => a.Login.Equals(login));
-        return atc?.AccountToUser.UserId;
+        return atc?.AccountToUser?.UserId;
     }
     
     public async Task<string> GetUserLogin(Guid guid)
