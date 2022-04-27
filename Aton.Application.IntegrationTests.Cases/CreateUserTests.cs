@@ -11,8 +11,6 @@ namespace Aton.Application.IntegrationTests.Cases;
 
 public class CreateUserTests : TestBase
 {
-   
-    
     [Test]
     public async Task CreateUserTest()
     {
