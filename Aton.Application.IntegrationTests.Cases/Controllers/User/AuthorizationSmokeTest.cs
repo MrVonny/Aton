@@ -1,13 +1,10 @@
-using System;
 using System.Net;
 using System.Threading.Tasks;
 using Aton.Application.IntegrationTests.Cases.Utils;
 using Aton.Application.IntegrationTests.Framework;
-using Aton.Application.ViewModels;
-using Aton.Domain.Models;
 using NUnit.Framework;
 
-namespace Aton.Application.IntegrationTests.Cases;
+namespace Aton.Application.IntegrationTests.Cases.Controllers.User;
 
 public class AuthorizationSmokeTest : TestBase
 {

@@ -4,6 +4,7 @@ using Aton.Infrastructure.Data.Contexts;
 using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Infrastructure.Identity.Models;
+using Aton.Services.Api;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

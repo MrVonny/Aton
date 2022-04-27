@@ -98,4 +98,7 @@ app.UseEndpoints(endpoints =>
 
 app.Run();
 
-public partial class Program { }
+namespace Aton.Services.Api
+{
+    public partial class Program { }
+}

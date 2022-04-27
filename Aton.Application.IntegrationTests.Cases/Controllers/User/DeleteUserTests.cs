@@ -5,7 +5,7 @@ using Aton.Application.IntegrationTests.Cases.Utils;
 using Aton.Application.IntegrationTests.Framework;
 using NUnit.Framework;
 
-namespace Aton.Application.IntegrationTests.Cases;
+namespace Aton.Application.IntegrationTests.Cases.Controllers.User;
 
 public class DeleteUserTests : TestBase
 {
