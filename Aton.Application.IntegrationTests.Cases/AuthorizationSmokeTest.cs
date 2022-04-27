@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Threading.Tasks;
+using Aton.Application.IntegrationTests.Cases.Utils;
 using Aton.Application.IntegrationTests.Framework;
 using Aton.Application.ViewModels;
 using Aton.Domain.Models;
@@ -11,16 +12,6 @@ namespace Aton.Application.IntegrationTests.Cases;
 public class AuthorizationSmokeTest : TestBase
 {
 
-    private static CreateUserViewModel ValidUser => new CreateUserViewModel()
-    {
-        Name = "Козлов Кирилл",
-        Login = "Trishu123",
-        Password = "12345678",
-        Admin = false,
-        Gender = Gender.Male,
-        Birthday = DateTime.Parse("1999-04-01")
-    };
-    
     [Test]
     public async Task ReturnsUnauthorizedWhenNoCredentials()
     {
@@ -54,11 +45,11 @@ public class AuthorizationSmokeTest : TestBase
             .Auth
                 .LoginAsAdmin()
             .UserController
-                .CreateUser(ValidUser)
+                .CreateUser(UserStorage.ValidUserViewModel)
                 .Response
                     .AssertStatusCode(HttpStatusCode.OK)
             .Client.Auth
-                .FromUserNameAndPassword(ValidUser.Login, ValidUser.Password)
+                .FromUserNameAndPassword(UserStorage.ValidUserViewModel.Login, UserStorage.ValidUserViewModel.Password)
             .UserController
                 .GetMe()
                 .Response
