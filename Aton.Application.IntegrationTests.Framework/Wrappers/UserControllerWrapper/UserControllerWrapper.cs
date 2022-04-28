@@ -58,7 +58,16 @@ public class UserControllerWrapper : BaseWrapper
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/info?{query}"));
         return this;
     }
-    public UserControllerWrapper EditUserLogin() => throw new NotImplementedException();
-    public UserControllerWrapper EditUserPassword() => throw new NotImplementedException();
+    public UserControllerWrapper EditUserLogin(string login, string newLogin)
+    {
+        Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/login?newLogin={newLogin}"));
+        return this;
+    }
+
+    public UserControllerWrapper EditUserPassword(string login, string password)
+    {
+        Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/password?newPassword={password}"));
+        return this;
+    }
     public UserControllerWrapper Restore() => throw new NotImplementedException();
 }
