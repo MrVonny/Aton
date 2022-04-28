@@ -16,11 +16,6 @@ public class UserSelectionTests : TestBase
 {
     private List<CreateUserViewModel> UserViewModels { get; set; } = new List<CreateUserViewModel>();
     
-    [SetUp]
-    public async Task SetUp()
-    {
-       
-    }
     
     [Test]
     public async Task OlderThanValidResponse()
@@ -43,7 +38,7 @@ public class UserSelectionTests : TestBase
                     .AssertStatusCode(HttpStatusCode.OK)
                     .Json
                         .AssertThat<List<AspUserViewModel>>(Is.All.Property(nameof(AspUserViewModel.Birthday)).LessThanOrEqualTo(DateTime.Now.AddYears(-40)))
-                        .AssertThat<List<AspUserViewModel>>(Has.Count.EqualTo(users.Count(x=>x.Birthday <= DateTime.Now.AddYears(-40))))
+                        .AssertThat<List<AspUserViewModel>>(Has.Count.EqualTo(users.Count(x => x.Birthday <= DateTime.Now.AddYears(-40))))
             .Client.Tasks.RunAsync();
     }
     

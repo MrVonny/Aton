@@ -21,6 +21,16 @@ public abstract class TestBase
     protected ClientFacade Client => _client ??= new ClientFacade(_httpClient);
     protected ServiceProvider ServiceProvider = null;
 
+    [SetUp]
+    public virtual async Task SetUp()
+    {
+        using var scope = ServiceProvider.CreateScope();
+        var scopedServices = scope.ServiceProvider;
+        
+        var accountManager = scopedServices.GetRequiredService<AccountManager>();
+        await accountManager.CreateAsync(new Account("TestUser", "TestUser", false));
+    }
+
     [TearDown]
     public virtual async Task TearDown()
     {
@@ -30,11 +40,8 @@ public abstract class TestBase
         var applicationDb = scopedServices.GetRequiredService<ApplicationDbContext>();
         var accountDb = scopedServices.GetRequiredService<AccountDbContext>();
         
-        // await applicationDb.Database.EnsureDeletedAsync();
-        // await accountDb.Database.EnsureDeletedAsync();
-        
-        // await applicationDb.Database.EnsureCreatedAsync();
-        // await accountDb.Database.EnsureCreatedAsync();
+        await applicationDb.Database.EnsureDeletedAsync();
+        await accountDb.Database.EnsureDeletedAsync();
     }
     
     protected TestBase()
@@ -65,21 +72,6 @@ public abstract class TestBase
 
                     var sp = services.BuildServiceProvider();
                     ServiceProvider = sp;
-
-                    using (var scope = sp.CreateScope())
-                    {
-                        var scopedServices = scope.ServiceProvider;
-                        var accountManager = scopedServices.GetRequiredService<AccountManager>();
-                        try
-                        {
-                            await accountManager.CreateAsync(new Account("TestUser", "TestUser", false));
-                        }
-                        catch (Exception ex)
-                        {
-                            // logger.LogError(ex, "An error occurred seeding the " +
-                            //                     "database with test messages. Error: {Message}", ex.Message);
-                        }
-                    }
                 });
             });
 

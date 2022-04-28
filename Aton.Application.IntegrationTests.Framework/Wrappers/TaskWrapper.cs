@@ -18,9 +18,8 @@ public class TaskWrapper : BaseWrapper
     
     public async Task RunAsync()
     {
-        foreach (var task in _tasks)
-        {
+        foreach (var task in _tasks) 
             await task();
-        }
+        _tasks.Clear();
     }
 }

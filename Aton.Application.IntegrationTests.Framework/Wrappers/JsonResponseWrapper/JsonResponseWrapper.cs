@@ -19,14 +19,4 @@ public partial class JsonResponseWrapper : BaseWrapper
         Client.Tasks.AddTask(async () => await  AssertThatAsync<T>(constraint));
         return this;
     }
-    
-    private async Task AssertThatAsync<T>(Constraint constraint) where T : class
-    {
-        var response = await Client.LastResponse.Content.ReadAsStringAsync();
-        var jResponse = JsonSerializer.Deserialize<Response<T>>(response, new JsonSerializerOptions()
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-        });
-        Assert.That(jResponse?.Data, constraint);
-    }
 }
