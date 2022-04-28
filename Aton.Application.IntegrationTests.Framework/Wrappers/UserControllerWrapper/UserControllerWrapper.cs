@@ -3,7 +3,7 @@ using Aton.Application.IntegrationTests.Framework.Facades;
 using Aton.Application.ViewModels;
 using Aton.Domain.Models;
 
-namespace Aton.Application.IntegrationTests.Framework.Wrappers.Controllers;
+namespace Aton.Application.IntegrationTests.Framework.Wrappers.UserControllerWrapper;
 
 public class UserControllerWrapper : BaseWrapper
 {
@@ -20,7 +20,12 @@ public class UserControllerWrapper : BaseWrapper
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Get, Uri + "/active"));
         return this;
     }
-    public UserControllerWrapper GetOlderThan(int age) => throw new NotImplementedException();
+
+    public UserControllerWrapper GetOlderThan(int age)
+    {
+        Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Get, Uri + $"/older-than/{age}"));
+        return this;
+    }
 
     public UserControllerWrapper GetUser(string login)
     {
@@ -49,7 +54,7 @@ public class UserControllerWrapper : BaseWrapper
          Gender? gender = null,
          DateTime? birthday = null)
     {
-        var query = new { name, gender, birthday }.GetQueryString();;
+        var query = new { name, gender, birthday }.GetQueryString();
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/info?{query}"));
         return this;
     }

@@ -15,10 +15,28 @@ namespace Aton.Application.IntegrationTests.Framework;
 [TestFixture]
 public abstract class TestBase
 {
-    private readonly HttpClient _client;
+    private readonly HttpClient _httpClient;
+    private ClientFacade _client;
 
-    protected ClientFacade Client => new ClientFacade(_client);
+    protected ClientFacade Client => _client ??= new ClientFacade(_httpClient);
+    protected ServiceProvider ServiceProvider = null;
 
+    [TearDown]
+    public virtual async Task TearDown()
+    {
+        using var scope = ServiceProvider.CreateScope();
+        var scopedServices = scope.ServiceProvider;
+        
+        var applicationDb = scopedServices.GetRequiredService<ApplicationDbContext>();
+        var accountDb = scopedServices.GetRequiredService<AccountDbContext>();
+        
+        // await applicationDb.Database.EnsureDeletedAsync();
+        // await accountDb.Database.EnsureDeletedAsync();
+        
+        // await applicationDb.Database.EnsureCreatedAsync();
+        // await accountDb.Database.EnsureCreatedAsync();
+    }
+    
     protected TestBase()
     {
         var randomDbName = Guid.NewGuid().ToString();
@@ -46,6 +64,7 @@ public abstract class TestBase
                     });
 
                     var sp = services.BuildServiceProvider();
+                    ServiceProvider = sp;
 
                     using (var scope = sp.CreateScope())
                     {
@@ -64,7 +83,7 @@ public abstract class TestBase
                 });
             });
 
-        _client = application.CreateClient();
+        _httpClient = application.CreateClient();
         
     }
 }

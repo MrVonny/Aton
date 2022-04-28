@@ -12,6 +12,8 @@ public partial class ResponseWrapper : BaseWrapper
     {
     }
 
+    public JsonResponseWrapper.JsonResponseWrapper Json => new(Client);
+
     public ResponseWrapper AssertStatusCode(HttpStatusCode statusCode)
     {
         Client.Tasks.AddTask(async () => await AssertStatusCodeAsync(statusCode));

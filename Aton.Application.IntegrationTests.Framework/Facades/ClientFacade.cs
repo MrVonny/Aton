@@ -1,6 +1,7 @@
 ﻿using Aton.Application.IntegrationTests.Framework.Wrappers;
 using Aton.Application.IntegrationTests.Framework.Wrappers.AuthWrapper;
-using Aton.Application.IntegrationTests.Framework.Wrappers.Controllers;
+using Aton.Application.IntegrationTests.Framework.Wrappers.UserControllerWrapper;
+using Aton.Application.IntegrationTests.Framework.Wrappers.UtilsWrapper;
 
 namespace Aton.Application.IntegrationTests.Framework.Facades;
 
@@ -14,9 +15,9 @@ public class ClientFacade
         Tasks = new TaskWrapper(this);
         HttpClient = client;
     }
-
     
     public AuthWrapper Auth => new AuthWrapper(this);
+    public UtilsWrapper Utils => new UtilsWrapper(this);
     public AccountsWrapper Accounts => new AccountsWrapper(this);
     public UserControllerWrapper UserController => new(this);
 }

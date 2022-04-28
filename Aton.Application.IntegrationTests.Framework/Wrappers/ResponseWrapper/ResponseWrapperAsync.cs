@@ -5,7 +5,7 @@ using NUnit.Framework.Constraints;
 
 namespace Aton.Application.IntegrationTests.Framework.Wrappers.ResponseWrapper;
 
-public partial class ResponseWrapper : BaseWrapper
+public partial class ResponseWrapper
 {
     private async Task AssertStatusCodeAsync(HttpStatusCode statusCode)
     {
