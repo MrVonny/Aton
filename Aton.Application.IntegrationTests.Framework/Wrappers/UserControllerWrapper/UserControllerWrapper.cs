@@ -54,7 +54,7 @@ public class UserControllerWrapper : BaseWrapper
          Gender? gender = null,
          DateTime? birthday = null)
     {
-        var query = new { name, gender, birthday }.GetQueryString();
+        var query = $"name={name}&gender={gender}&birthday={(birthday.HasValue ? birthday.Value.ToString("s"): (DateTime?)null)}";
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/info?{query}"));
         return this;
     }
@@ -69,5 +69,9 @@ public class UserControllerWrapper : BaseWrapper
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/password?newPassword={password}"));
         return this;
     }
-    public UserControllerWrapper Restore() => throw new NotImplementedException();
+    public UserControllerWrapper Restore(string login) 
+    {
+        Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/restore"));
+        return this;
+    }
 }

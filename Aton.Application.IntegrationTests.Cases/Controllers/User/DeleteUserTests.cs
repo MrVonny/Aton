@@ -92,4 +92,54 @@ public class DeleteUserTests : TestBase
                     .AssertStatusCode(HttpStatusCode.Unauthorized)
             .Client.Tasks.RunAsync();
     }
+    
+    [Test]
+    public async Task RestoreSoftDeletedUser()
+    {
+        var user = UserStorage.GenerateValidUserViewModel;
+        await Client
+            .Auth
+                .LoginAsAdmin()
+            .UserController
+                .CreateUser(user)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.UserController
+                .DeleteUser(user.Login, true)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.UserController
+                .Restore(user.Login)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.Auth
+                .FromUserNameAndPassword(user.Login, user.Password)
+            .UserController
+                .GetMe()
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.Tasks.RunAsync();
+    }
+    
+    [Test]
+    public async Task RestoreHardDeletedUser()
+    {
+        var user = UserStorage.GenerateValidUserViewModel;
+        await Client
+            .Auth
+                .LoginAsAdmin()
+            .UserController
+                .CreateUser(user)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.UserController
+                .DeleteUser(user.Login, false)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.OK)
+            .Client.UserController
+                .Restore(user.Login)
+                .Response
+                    .AssertStatusCode(HttpStatusCode.BadRequest)
+            .Client.Tasks.RunAsync();
+    }
 }
