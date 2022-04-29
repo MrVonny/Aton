@@ -18,7 +18,7 @@ public class CreateUserTests : TestBase
             .UserController
                 .CreateUser(UserStorage.ValidUserViewModel)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             //Get this user
             .Client.UserController
                 .GetUser(UserStorage.ValidUserViewModel.Login)

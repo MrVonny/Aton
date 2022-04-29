@@ -44,7 +44,7 @@ public class AuthorizationSmokeTest : TestBase
             .UserController
                 .CreateUser(UserStorage.ValidUserViewModel)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.Auth
                 .FromUserNameAndPassword(UserStorage.ValidUserViewModel.Login, UserStorage.ValidUserViewModel.Password)
             .UserController

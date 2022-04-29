@@ -45,6 +45,24 @@ namespace Aton.Services.Api.Controllers
                 errors = _notifications.GetNotifications().Select(n => n.Value)
             });
         }
+        
+        protected new IActionResult CreatedResponse(string action, object result = null)
+        {
+            if (IsValidOperation())
+            {
+                return Created(action, new
+                {
+                    success = true,
+                    data = result
+                });
+            }
+
+            return BadRequest(new
+            {
+                success = false,
+                errors = _notifications.GetNotifications().Select(n => n.Value)
+            });
+        }
 
         protected void NotifyModelStateErrors()
         {

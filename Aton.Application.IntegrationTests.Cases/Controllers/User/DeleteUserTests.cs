@@ -19,7 +19,7 @@ public class DeleteUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.UserController
                 .DeleteUser(user.Login, true)
                 .Response
@@ -44,7 +44,7 @@ public class DeleteUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.UserController
                 .DeleteUser(user.Login, false)
                 .Response
@@ -79,7 +79,7 @@ public class DeleteUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.UserController
                 .DeleteUser(user.Login, true)
                 .Response
@@ -103,7 +103,7 @@ public class DeleteUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.UserController
                 .DeleteUser(user.Login, true)
                 .Response
@@ -131,7 +131,7 @@ public class DeleteUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.UserController
                 .DeleteUser(user.Login, false)
                 .Response

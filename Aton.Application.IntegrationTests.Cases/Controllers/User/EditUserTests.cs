@@ -21,7 +21,7 @@ public class EditUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.Auth
                 .FromUserNameAndPassword(user.Login, user.Password)
             .UserController
@@ -55,7 +55,7 @@ public class EditUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.Auth
                 .FromUserNameAndPassword(user.Login, user.Password)
             .UserController
@@ -89,7 +89,7 @@ public class EditUserTests : TestBase
             .UserController
                 .CreateUser(user)
                 .Response
-                    .AssertStatusCode(HttpStatusCode.OK)
+                    .AssertStatusCode(HttpStatusCode.Created)
             .Client.Auth
                 .FromUserNameAndPassword(user.Login, user.Password)
             .UserController

@@ -30,7 +30,7 @@ public class UserSelectionTests : TestBase
                     Client.UserController
                         .CreateUser(model)
                         .Response
-                            .AssertStatusCode(HttpStatusCode.OK)
+                            .AssertStatusCode(HttpStatusCode.Created)
                     )
             .Client.UserController
                 .GetOlderThan(40)
@@ -57,7 +57,7 @@ public class UserSelectionTests : TestBase
                     Client.UserController
                         .CreateUser(model)
                         .Response
-                            .AssertStatusCode(HttpStatusCode.OK)
+                            .AssertStatusCode(HttpStatusCode.Created)
                     )
                 .Repeat(revokedUsers,
                 model =>

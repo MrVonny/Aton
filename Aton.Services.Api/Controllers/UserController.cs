@@ -161,7 +161,7 @@ public class UserController : ApiController
             return Response();
         }
 
-        return Response(createUserViewModel);
+        return CreatedResponse($"api/v1/users/{createUserViewModel.Login}", createUserViewModel);
     }
     
     [HttpPost]
