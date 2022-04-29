@@ -39,7 +39,7 @@ namespace Aton.Services.Api.Controllers
                 });
             }
 
-            return BadRequest(new
+            return BadRequest(new 
             {
                 success = false,
                 errors = _notifications.GetNotifications().Select(n => n.Value)

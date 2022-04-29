@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Net.Mime;
 using System.Security.Claims;
 using Aton.Application.Interfaces;
 using Aton.Application.ViewModels;
@@ -8,6 +9,7 @@ using Aton.Domain.Models;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Infrastructure.Identity.Models;
 using Aton.Services.Api.Services;
+using Aton.Services.Api.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +40,7 @@ public class UserController : ApiController
     [HttpGet]
     [Authorize(Roles = "Admin")]
     [Route("active")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<AspUserViewModel>),StatusCodes.Status200OK)]
     [SwaggerOperation(
         Summary = "Returns a list of active users sorted by creation date",
         Description = "Requires admin privileges"
@@ -52,7 +54,7 @@ public class UserController : ApiController
     [HttpGet]
     [Route("older-than/{olderThan:int}")]
     [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(List<AspUserViewModel>),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Returns a list of users older than a certain age",
@@ -71,7 +73,7 @@ public class UserController : ApiController
 
     [HttpGet]
     [Route("{login}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Returns the user with the specified login",
@@ -94,7 +96,7 @@ public class UserController : ApiController
 
     [HttpGet]
     [Route("me")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [SwaggerOperation(
         Summary = "Returns the user who sent the request",
         Description = "No admin rights required"
@@ -115,7 +117,7 @@ public class UserController : ApiController
     
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status201Created, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Creates new user",
@@ -161,12 +163,12 @@ public class UserController : ApiController
             return Response();
         }
 
-        return CreatedResponse($"api/v1/users/{createUserViewModel.Login}", createUserViewModel);
+        return CreatedResponse($"api/v1/users/{createUserViewModel.Login}", await _userAccountConnector.GetByLogin(createUserViewModel.Login));
     }
     
     [HttpPost]
     [Route("{login}/info")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Changes user information",
@@ -195,14 +197,14 @@ public class UserController : ApiController
 
         var model = new EditUserInfoModel(userGuid, name, gender, birthday);
 
-        var user = await _userAppService.Edit(model, GetUserLogin());
+        await _userAppService.Edit(model, GetUserLogin());
 
-        return Response(user);
+        return Response(await _userAccountConnector.GetByLogin(login));
     }
 
     [HttpPost]
     [Route("{login}/login")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Changes user's login",
@@ -228,12 +230,12 @@ public class UserController : ApiController
             return Response();
         }
         
-        return Response();
+        return Response(await _userAccountConnector.GetByLogin(newLogin));
     }
     
     [HttpPost]
     [Route("{login}/password")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Changes user's password",
@@ -257,13 +259,13 @@ public class UserController : ApiController
             return Response();
         }
         
-        return Response();
+        return Response(await _userAccountConnector.GetByLogin(login));
     }
     
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [Route("{login}/restore")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(AspUserViewModel),StatusCodes.Status200OK, MediaTypeNames.Application.Json)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [SwaggerOperation(
         Summary = "Restores a deleted user",
@@ -293,7 +295,7 @@ public class UserController : ApiController
 
         await _userAppService.Restore(userGuid.Value);
 
-        return Response();
+        return Response(_userAccountConnector.GetByLogin(login));
     }
 
     [HttpDelete]
