@@ -32,7 +32,7 @@ namespace Aton.Domain.CommandHandlers
             if (_notifications.HasNotifications()) return false;
             if (_uow.Commit()) return true;
 
-            _bus.RaiseEvent(new DomainNotification("Commit", "We had a problem during saving your data."));
+            _bus.RaiseEvent(new DomainNotification("Commit", "No changes found."));
             return false;
         }
     }
