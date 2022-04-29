@@ -3,7 +3,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Aton.Services.Api.ViewModels;
 
-[SwaggerSchema("CreateUserViewModel")]
+[SwaggerSchema(Title = "CreateUserViewModel")]
 public class AspCreateUserViewModel
 {
     [SwaggerSchema("Login", Nullable = false)]

@@ -4,7 +4,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace Aton.Services.Api.ViewModels;
 
 //[SwaggerSchemaFilter(typeof(AspUserViewModelSchema))]
-[SwaggerSchema("UserViewModel", ReadOnly = true)]
+[SwaggerSchema(Title = "UserViewModel", ReadOnly = true)]
 public class AspUserViewModel
 {
     [SwaggerSchema("Name", Nullable = false)]
