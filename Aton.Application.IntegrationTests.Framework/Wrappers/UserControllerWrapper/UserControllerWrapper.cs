@@ -1,4 +1,6 @@
-﻿using Aton.Application.IntegrationTests.Framework.Extensions;
+﻿using System.Text;
+using System.Web;
+using Aton.Application.IntegrationTests.Framework.Extensions;
 using Aton.Application.IntegrationTests.Framework.Facades;
 using Aton.Application.ViewModels;
 using Aton.Domain.Models;
@@ -54,7 +56,14 @@ public class UserControllerWrapper : BaseWrapper
          Gender? gender = null,
          DateTime? birthday = null)
     {
-        var query = $"name={name}&gender={gender}&birthday={(birthday.HasValue ? birthday.Value.ToString("s"): (DateTime?)null)}";
+        List<string> queries = new List<string>();
+        if (name != null)
+            queries.Add($"name={HttpUtility.UrlEncode(name)}");
+        if (gender != null)
+            queries.Add($"gender={HttpUtility.UrlEncode(gender.Value.ToString())}");
+        if (birthday != null)
+            queries.Add($"birthday={HttpUtility.UrlEncode(birthday.Value.ToString("s"))}");
+        var query = string.Join("&", queries);
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri + $"/{login}/info?{query}"));
         return this;
     }

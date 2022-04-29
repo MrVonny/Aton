@@ -1,5 +1,6 @@
-﻿using System.Text.Json;
+﻿
 using Aton.Application.IntegrationTests.Framework.Common;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
@@ -10,9 +11,9 @@ public partial class JsonResponseWrapper
     private async Task AssertThatAsync<T>(Constraint constraint) where T : class
     {
         var response = await Client.LastResponse.Content.ReadAsStringAsync();
-        var jResponse = JsonSerializer.Deserialize<Response<T>>(response, new JsonSerializerOptions()
+        var jResponse = JsonConvert.DeserializeObject<Response<T>>(response, new JsonSerializerSettings()
         {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+
         });
         Assert.That(jResponse?.Data, constraint);
     }

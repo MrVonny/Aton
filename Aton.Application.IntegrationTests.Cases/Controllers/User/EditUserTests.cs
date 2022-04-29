@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Aton.Application.IntegrationTests.Cases.Utils;
 using Aton.Application.IntegrationTests.Framework;
+using Aton.Domain.Models;
 using Aton.Services.Api.ViewModels;
 using NUnit.Framework;
 
@@ -101,7 +102,7 @@ public class EditUserTests : TestBase
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Name)).EqualTo(user.Name))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Birthday)).EqualTo(user.Birthday))
             .Client.UserController
-                .EditUserInfo(user.Login,  birthday: DateTime.Parse("13-05-1999"), name: "Михайлов Алексей")
+                .EditUserInfo(user.Login,  birthday: DateTime.Parse("13-05-1999"), name: "Михайлов Алексей", gender: Gender.Unknown)
                 .Response
                     .AssertStatusCode(HttpStatusCode.OK)
             .Client.UserController
@@ -109,6 +110,7 @@ public class EditUserTests : TestBase
                 .Response.Json
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Name)).EqualTo("Михайлов Алексей"))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Birthday)).EqualTo(DateTime.Parse("13-05-1999")))
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Gender)).EqualTo(Gender.Unknown))
             .Client.Tasks.RunAsync();
     }
 }
