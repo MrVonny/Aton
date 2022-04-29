@@ -1,7 +1,10 @@
 ﻿using Aton.Domain.Models;
+using Aton.Services.Api.Schemas;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Aton.Services.Api.ViewModels;
 
+[SwaggerSchemaFilter(typeof(AspUserViewModelSchema))]
 public class AspUserViewModel
 {
     public string Name { get; set; }

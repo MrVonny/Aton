@@ -6,16 +6,29 @@ using Aton.Services.Api.Services;
 using Aton.Services.Api.StartupExtensions;
 using MediatR;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var services = builder.Services;
 
-services.AddControllers();
+services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.Converters.Add(new StringEnumConverter {AllowIntegerValues = true});
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Include;
+    });
+    // .AddJsonOptions(options =>
+    // {
+    //     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: true));
+    //     options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+    // });
 services.AddEndpointsApiExplorer();
 #region Configure Swagger  
 services.AddSwaggerGen(c =>  
 {  
+    c.EnableAnnotations();
     c.SchemaFilter<SwaggerIgnoreFilter>();
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Aton", Version = "v1" });  
     c.AddSecurityDefinition("basic", new OpenApiSecurityScheme  
@@ -40,7 +53,8 @@ services.AddSwaggerGen(c =>
             new string[] {}  
         }  
     });  
-});  
+}); 
+services.AddSwaggerGenNewtonsoftSupport();
 #endregion  
 // ----- Database -----
 services.AddCustomizedDatabase(builder.Configuration, builder.Environment);

@@ -11,6 +11,7 @@ using Aton.Services.Api.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Aton.Services.Api.Controllers;
 
@@ -38,6 +39,10 @@ public class UserController : ApiController
     [Authorize(Roles = "Admin")]
     [Route("active")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperation(
+        Summary = "Returns a list of active users sorted by creation date",
+        Description = "Requires admin privileges"
+    )]
     public async Task<IActionResult> GetActiveOrdered()
     {
         var active = await _userAccountConnector.GetActiveOrdered();
@@ -49,7 +54,11 @@ public class UserController : ApiController
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetOlderThan([FromRoute, Required] int? olderThan)
+    [SwaggerOperation(
+        Summary = "Returns a list of users older than a certain age",
+        Description = "Requires admin privileges"
+    )]
+    public async Task<IActionResult> GetOlderThan([FromRoute, Required, Range(0, 100), SwaggerParameter("Age")] int? olderThan)
     {
         if (!ModelState.IsValid)
         {
@@ -64,7 +73,11 @@ public class UserController : ApiController
     [Route("{login}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> GetByLogin([FromRoute] string login)
+    [SwaggerOperation(
+        Summary = "Returns the user with the specified login",
+        Description = "Requires admin rights only to get other users"
+    )]
+    public async Task<IActionResult> GetByLogin([FromRoute, SwaggerParameter("User's login")] string login)
     {
         if (!IsUserAdmin() && GetUserLogin() != login)
             return Forbid();
@@ -82,6 +95,10 @@ public class UserController : ApiController
     [HttpGet]
     [Route("me")]
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [SwaggerOperation(
+        Summary = "Returns the user who sent the request",
+        Description = "No admin rights required"
+    )]
     public async Task<IActionResult> Me()
     {
         var user = await _userAccountConnector.GetByLogin(GetUserLogin());
@@ -100,6 +117,10 @@ public class UserController : ApiController
     [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Creates new user",
+        Description = "Requires admin privileges"
+    )]
     public async Task<IActionResult> Create(CreateUserViewModel createUserViewModel)
     {
         if (!ModelState.IsValid)
@@ -145,10 +166,16 @@ public class UserController : ApiController
     
     [HttpPost]
     [Route("{login}/info")]
-    public async Task<IActionResult> UpdateInfo([FromRoute(Name = "login")] string login,
-        [FromQuery] string name = null,
-        [FromQuery] Gender? gender = null,
-        [FromQuery] DateTime? birthday = null)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Changes user information",
+        Description = "No admin rights required to edit yourself. Requires admin rights only to edit other users"
+    )]
+    public async Task<IActionResult> UpdateInfo([FromRoute(Name = "login"), SwaggerParameter("User's login")] string login,
+        [FromQuery, SwaggerParameter("User's name")] string name = null,
+        [FromQuery, SwaggerParameter("User's gender")] Gender? gender = null,
+        [FromQuery, SwaggerParameter("User's Date of Birth")] DateTime? birthday = null)
     {
         if (!IsUserAdmin() && GetUserLogin() != login)
             return Forbid();
@@ -175,7 +202,14 @@ public class UserController : ApiController
 
     [HttpPost]
     [Route("{login}/login")]
-    public async Task<IActionResult> UpdateLogin([FromRoute(Name = "login")] string login, [FromQuery] string newLogin)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Changes user's login",
+        Description = "No admin rights required to edit yourself. Requires admin rights only to edit other users"
+    )]
+    public async Task<IActionResult> UpdateLogin([FromRoute(Name = "login"), SwaggerParameter("User's login")] string login,
+        [FromQuery, SwaggerParameter("New login")] string newLogin)
     {
         if (!IsUserAdmin() && GetUserLogin() != login)
             return Forbid();
@@ -199,7 +233,14 @@ public class UserController : ApiController
     
     [HttpPost]
     [Route("{login}/password")]
-    public async Task<IActionResult> UpdatePassword([FromRoute(Name = "login")] string login, [FromQuery] string newPassword)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Changes user's password",
+        Description = "No admin rights required to edit yourself. Requires admin rights only to edit other users"
+    )]
+    public async Task<IActionResult> UpdatePassword([FromRoute(Name = "login"), SwaggerParameter("User's login")] string login,
+        [FromQuery, SwaggerParameter("New password")] string newPassword)
     {
         if (!ModelState.IsValid)
         {
@@ -222,7 +263,13 @@ public class UserController : ApiController
     [HttpPost]
     [Authorize(Roles = "Admin")]
     [Route("{login}/restore")]
-    public async Task<IActionResult> Restore([FromRoute(Name = "login"), Required] string login)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Restores a deleted user",
+        Description = "Requires admin privileges"
+    )]
+    public async Task<IActionResult> Restore([FromRoute(Name = "login"), SwaggerParameter("User's login"), Required] string login)
     {
         if (!ModelState.IsValid)
         {
@@ -252,7 +299,14 @@ public class UserController : ApiController
     [HttpDelete]
     [Authorize(Roles = "Admin")]
     [Route("{login}")]
-    public async Task<IActionResult> Delete([FromRoute(Name = "login")] string login, [FromQuery] bool soft = true)
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [SwaggerOperation(
+        Summary = "Deletes a user",
+        Description = "Requires admin privileges"
+    )]
+    public async Task<IActionResult> Delete([FromRoute(Name = "login"), SwaggerParameter("User's login")] string login,
+        [FromQuery, SwaggerParameter("Set to true to be able to restore the user")] bool soft = true)
     {
         if (soft)
             await RevokeUser(login);
