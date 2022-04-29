@@ -4,6 +4,7 @@ using Aton.Application.IntegrationTests.Framework.Extensions;
 using Aton.Application.IntegrationTests.Framework.Facades;
 using Aton.Application.ViewModels;
 using Aton.Domain.Models;
+using Aton.Services.Api.ViewModels;
 
 namespace Aton.Application.IntegrationTests.Framework.Wrappers.UserControllerWrapper;
 
@@ -46,7 +47,7 @@ public class UserControllerWrapper : BaseWrapper
         return this;
     }
 
-    public UserControllerWrapper CreateUser(CreateUserViewModel model)
+    public UserControllerWrapper CreateUser(AspCreateUserViewModel model)
     {
         Client.Tasks.AddTask(async () => await RequestHelper.SendAsync(HttpMethod.Post, Uri , model));
         return this;

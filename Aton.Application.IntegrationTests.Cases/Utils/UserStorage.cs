@@ -2,12 +2,13 @@
 using System.Linq;
 using Aton.Application.ViewModels;
 using Aton.Domain.Models;
+using Aton.Services.Api.ViewModels;
 
 namespace Aton.Application.IntegrationTests.Cases.Utils;
 
 public static class UserStorage
 {
-    public static CreateUserViewModel ValidUserViewModel => new CreateUserViewModel()
+    public static AspCreateUserViewModel ValidUserViewModel => new AspCreateUserViewModel()
     {
         Name = "Козлов Кирилл",
         Login = "Trishu123",
@@ -17,7 +18,7 @@ public static class UserStorage
         Birthday = DateTime.Parse("1999-04-01")
     };
     
-    public static CreateUserViewModel InvalidUserViewModel => new CreateUserViewModel()
+    public static AspCreateUserViewModel InvalidUserViewModel => new AspCreateUserViewModel()
     {
         Name = "Новиков Генадий",
         Login = "Tri",
@@ -27,7 +28,7 @@ public static class UserStorage
         Birthday = DateTime.Parse("1999-04-01")
     };
 
-    public static CreateUserViewModel GenerateValidUserViewModel => new()
+    public static AspCreateUserViewModel GenerateValidUserViewModel => new()
     {
         Name = RandomName,
         Login = RandomLogin,

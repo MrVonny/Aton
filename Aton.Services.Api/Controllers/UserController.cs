@@ -123,47 +123,21 @@ public class UserController : ApiController
         Summary = "Creates new user",
         Description = "Requires admin privileges"
     )]
-    public async Task<IActionResult> Create(CreateUserViewModel createUserViewModel)
+    public async Task<IActionResult> Create(AspCreateUserViewModel aspCreateUserViewModel)
     {
         if (!ModelState.IsValid)
         {
             NotifyModelStateErrors();
-            return Response(createUserViewModel);
+            return Response(aspCreateUserViewModel);
         }
-        
 
-        var account = new Account(
-            createUserViewModel.Login,
-            createUserViewModel.Password,
-            createUserViewModel.Admin.GetValueOrDefault());
-        
-        _accountManager.CurrentUser = GetUserLogin();
-        var identityResult = await _accountManager.CreateAsync(account);
+        _userAccountConnector.CurrentUser = GetUserLogin();
 
-        if (!identityResult.IsSuccess)
-        {
-            AddIdentityErrors(identityResult);
-                return Response();
-        }
-        
-        var userGuid = await _userAppService.Create(createUserViewModel, GetUserLogin());
-
-        if (userGuid == null)
-        {
-            await _accountManager.Remove(createUserViewModel.Login);
+        var created = await _userAccountConnector.CreateUser(aspCreateUserViewModel);
+        if (created == null)
             return Response();
-        }
 
-        _accountManager.CurrentUser = GetUserLogin();
-        var mapResult = await _accountManager.MapToUser(createUserViewModel.Login, userGuid.Value);
-        
-        if (!mapResult.IsSuccess)
-        {
-            AddIdentityErrors(identityResult);
-            return Response();
-        }
-
-        return CreatedResponse($"api/v1/users/{createUserViewModel.Login}", await _userAccountConnector.GetByLogin(createUserViewModel.Login));
+        return CreatedResponse($"api/v1/users/{created.Login}", created);
     }
     
     [HttpPost]

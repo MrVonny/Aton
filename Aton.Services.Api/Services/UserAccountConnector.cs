@@ -4,6 +4,7 @@ using Aton.Application.ViewModels;
 using Aton.Domain.Core.Bus;
 using Aton.Domain.Core.Notifications;
 using Aton.Infrastructure.Identity.Managers;
+using Aton.Infrastructure.Identity.Models;
 using Aton.Services.Api.ViewModels;
 using AutoMapper;
 
@@ -75,6 +76,40 @@ public class UserAccountConnector : IUserAccountConnector
         return await GetAspViewModels(users);
     }
 
+    public async Task<AspUserViewModel> CreateUser(AspCreateUserViewModel viewModel)
+    {
+        var account = new Account(
+            viewModel.Login,
+            viewModel.Password,
+            viewModel.Admin.GetValueOrDefault());
+        
+        var identityResult = await _accountManager.CreateAsync(account);
+
+        if (!identityResult.IsSuccess)
+        {
+            AddIdentityErrors(identityResult);
+            return null;
+        }
+
+        var userGuid = await _userAppService.Create(_mapper.Map<CreateUserViewModel>(viewModel), CurrentUser);
+
+        if (userGuid == null)
+        {
+            await _accountManager.Remove(viewModel.Login);
+            return null;
+        }
+        
+        var mapResult = await _accountManager.MapToUser(viewModel.Login, userGuid.Value);
+        
+        if (!mapResult.IsSuccess)
+        {
+            AddIdentityErrors(identityResult);
+            return null;
+        }
+
+        return await GetByLogin(viewModel.Login);
+    }
+
     public async Task<AspUserViewModel>  GetByLogin(string login)
     {
         var guid = await _accountManager.GetUserGuid(login);
@@ -128,6 +163,7 @@ public interface IUserAccountConnector
     public string CurrentUser { get; set; }
     public Task<IEnumerable<AspUserViewModel>> GetActiveOrdered();
     public Task<IEnumerable<AspUserViewModel>> GetOlderThan(int olderThan);
+    public Task<AspUserViewModel> CreateUser(AspCreateUserViewModel viewModel);
     public Task<AspUserViewModel> GetByLogin(string login);
     public Task Delete(string login);
     public Task Revoke(string login);

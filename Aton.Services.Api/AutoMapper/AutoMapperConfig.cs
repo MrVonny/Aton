@@ -18,6 +18,7 @@ namespace Aton.Services.Api.AutoMapper
             return new Type[]
             {
                 typeof(AppModelToAspModelProfile),
+                typeof(AspModelToAppModelProfile)
             };
         }
     }
