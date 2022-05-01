@@ -11,7 +11,7 @@ public class DeleteUserCommand : UserCommand<bool>
     
     public override bool IsValid()
     {
-        ValidationResult = new DeleteUserCommandValidation(this).Validate(this);
+        ValidationResult = new DeleteUserCommandValidation(this).Validate();
         return ValidationResult.IsValid;
     }
 }

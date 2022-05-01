@@ -11,7 +11,7 @@ public class RestoreUserCommand : UserCommand<bool>
     
     public override bool IsValid()
     {
-        ValidationResult = new RestoreUserCommandValidation(this).Validate(this);
+        ValidationResult = new RestoreUserCommandValidation(this).Validate();
         return ValidationResult.IsValid;
     }
 

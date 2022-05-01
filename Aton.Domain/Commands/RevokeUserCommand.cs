@@ -13,7 +13,7 @@ public class RevokeUserCommand : UserCommand<bool>
     public string RevokedBy { get; set; }
     public override bool IsValid()
     {
-        ValidationResult = new RevokeUserCommandValidation(this).Validate(this);
+        ValidationResult = new RevokeUserCommandValidation(this).Validate();
         return ValidationResult.IsValid;
     }
 }

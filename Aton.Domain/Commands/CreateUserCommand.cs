@@ -14,7 +14,7 @@ public class CreateUserCommand : UserCommand<User>
     }
     public override bool IsValid()
     {
-        ValidationResult = new CreateUserCommandValidation(this).Validate(this);
+        ValidationResult = new CreateUserCommandValidation(this).Validate();
         return ValidationResult.IsValid;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Aton.Domain.Commands;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace Aton.Domain.Validations;
 
@@ -12,12 +13,17 @@ public class UserValidation <T> : AbstractValidator<T> where T : IUserCommand
         Object = value;
     }
 
+    public ValidationResult Validate()
+    {
+        return Validate(Object);
+    }
+
     protected void ValidateName()
     {
         RuleFor(c => c.Name)
             .NotEmpty().WithMessage("Please ensure you have entered the Name")
-            .Length(2, 150).WithMessage("The Name must have between 2 and 150 characters")
-            .Matches(@"[ЁёА-яa-zA-Z ]").WithMessage("Only Latin and Cyrillic letters are allowed");
+            .Length(5, 70).WithMessage("The Name must have between 5 and 70 characters")
+            .Matches(@"^[\w'\-,.][^0-9_!¡?÷?¿/\\+=@#$%ˆ&*(){}|~<>;:[\]]{2,}$").WithMessage("Only Latin and Cyrillic letters are allowed");
     }
 
     protected void ValidateBirthDate()

@@ -15,7 +15,7 @@ public class EditUserCommand : UserCommand<User>
     }
     public override bool IsValid()
     {
-        ValidationResult = new EditUserCommandValidation(this).Validate(this);
+        ValidationResult = new EditUserCommandValidation(this).Validate();
         return ValidationResult.IsValid;
     }
 }
