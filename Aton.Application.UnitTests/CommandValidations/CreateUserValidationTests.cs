@@ -2,9 +2,7 @@
 using Aton.Domain.Commands;
 using Aton.Domain.Models;
 using Aton.Domain.Validations;
-using FluentValidation.Results;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace Aton.Application.UnitTests.CommandValidations;
 
@@ -17,11 +15,12 @@ public class CreateUserValidationTests
         ValidateCommand(true,"Иван Брайко", Gender.Male, DateTime.Parse("1990-05-12"));
         ValidateCommand(true,"Большой Умный Парень Имя", Gender.Male, DateTime.Parse("1990-05-12"));
         ValidateCommand(true,"Repon Cristof", Gender.Unknown, DateTime.Parse("1935-12-02"));
+        ValidateCommand(true,"Роман Ан Дер Гольд", Gender.Female);
         ValidateCommand(true,"Mathias d'Arras", Gender.Female);
         ValidateCommand(true,"Martin Luther King, Jr.", Gender.Female);
         ValidateCommand(true,"Hector Sausage-Hausen", Gender.Female);
-        ValidateCommand(true,"Роман Ан Дер Гольд", Gender.Female);
-        ValidateCommand(true,"Роман Ан Дер Гольд", Gender.Female);
+        
+        
     }
 
     [Test]
@@ -33,10 +32,9 @@ public class CreateUserValidationTests
         ValidateCommand(false,"ASWdjhja sk kjsadokjIA SDjioajI JDSiajidajio DIOAsjiopdjkiosajdoiuj iaosjdoijaqoi", Gender.Female);
         ValidateCommand(false,"Not", Gender.Female);
         ValidateCommand(false,"!@#$%^&*()((*&^%%", Gender.Female);
-        ValidateCommand(false,"Валерий_Никитин", Gender.Female);
     }
 
-    private void ValidateCommand(bool constraint, string name, Gender gender = Gender.Unknown, DateTime? birthday = null)
+    private void ValidateCommand(bool constraint, string name, Gender gender, DateTime? birthday = null)
     {
         var command = new CreateUserCommand(name, gender, birthday);
         var validationResult = new CreateUserCommandValidation(command).Validate();
