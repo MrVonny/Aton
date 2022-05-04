@@ -1,5 +1,3 @@
-using Aton.Application.AutoMapper;
-
 namespace Aton.Services.Api.AutoMapper
 {
     public class AutoMapperConfig

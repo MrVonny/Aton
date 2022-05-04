@@ -1,8 +1,5 @@
-﻿using System.Text;
-using System.Web;
-using Aton.Application.IntegrationTests.Framework.Extensions;
+﻿using System.Web;
 using Aton.Application.IntegrationTests.Framework.Facades;
-using Aton.Application.ViewModels;
 using Aton.Domain.Models;
 using Aton.Services.Api.ViewModels;
 

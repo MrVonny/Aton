@@ -25,22 +25,6 @@ namespace Aton.Infrastructure.Data.Repository
             return await DbSet.FindAsync(id);
         }
 
-        public virtual IQueryable<TEntity> GetAll()
-        {
-            return DbSet;
-        }
-
-        // public virtual IQueryable<TEntity> GetAll(ISpecification<TEntity> spec)
-        // {
-        //     return ApplySpecification(spec);
-        // }
-
-        public virtual IQueryable<TEntity> GetAllSoftDeleted()
-        {
-            return DbSet.IgnoreQueryFilters()
-                .Where(e => EF.Property<bool>(e, "IsDeleted") == true);
-        }
-
         public virtual void Update(TEntity obj)
         {
             DbSet.Update(obj);
@@ -66,10 +50,5 @@ namespace Aton.Infrastructure.Data.Repository
             Db.Dispose();
             GC.SuppressFinalize(this);
         }
-
-        // private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
-        // {
-        //     return SpecificationEvaluator<TEntity>.GetQuery(DbSet.AsQueryable(), spec);
-        // }
     }
 }

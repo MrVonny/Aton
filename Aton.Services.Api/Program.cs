@@ -1,11 +1,9 @@
 using System.Reflection;
 using Aton.Infrastructure.IoC;
 using Aton.Services.Api.Configurations;
-using Aton.Services.Api.Filters;
 using Aton.Services.Api.Services;
 using Aton.Services.Api.StartupExtensions;
 using MediatR;
-using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

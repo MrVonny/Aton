@@ -3,7 +3,6 @@ using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Managers;
 using Aton.Services.Api.Auth;
 using idunno.Authentication.Basic;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 

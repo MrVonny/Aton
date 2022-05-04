@@ -1,4 +1,3 @@
-using Aton.Services.Api.Filters;
 using Microsoft.OpenApi.Models;
 
 namespace Aton.Services.Api.StartupExtensions
@@ -10,7 +9,6 @@ namespace Aton.Services.Api.StartupExtensions
             services.AddSwaggerGen(c =>  
             {  
                 c.EnableAnnotations();
-                c.SchemaFilter<SwaggerIgnoreFilter>();
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Aton", Version = "v1" });  
                 c.AddSecurityDefinition("basic", new OpenApiSecurityScheme  
                 {  

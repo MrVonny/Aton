@@ -1,8 +1,5 @@
 ﻿using System.Net.Http.Json;
-using System.Net.Mime;
 using Aton.Application.IntegrationTests.Framework.Facades;
-using Aton.Application.IntegrationTests.Framework.Wrappers;
-using Aton.Domain.Core.Commands;
 
 namespace Aton.Application.IntegrationTests.Framework.Helpers;
 

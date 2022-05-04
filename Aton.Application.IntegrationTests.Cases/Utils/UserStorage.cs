@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Aton.Application.ViewModels;
 using Aton.Domain.Models;
 using Aton.Services.Api.ViewModels;
 

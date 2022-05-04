@@ -1,5 +1,4 @@
 ﻿using Aton.Application.IntegrationTests.Framework.Facades;
-using Aton.Application.IntegrationTests.Framework.Wrappers;
 using Aton.Infrastructure.Data.Contexts;
 using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Managers;

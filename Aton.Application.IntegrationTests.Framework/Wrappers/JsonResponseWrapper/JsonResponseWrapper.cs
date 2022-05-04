@@ -1,8 +1,4 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
-using Aton.Application.IntegrationTests.Framework.Common;
-using Aton.Application.IntegrationTests.Framework.Facades;
-using NUnit.Framework;
+﻿using Aton.Application.IntegrationTests.Framework.Facades;
 using NUnit.Framework.Constraints;
 
 namespace Aton.Application.IntegrationTests.Framework.Wrappers.JsonResponseWrapper;

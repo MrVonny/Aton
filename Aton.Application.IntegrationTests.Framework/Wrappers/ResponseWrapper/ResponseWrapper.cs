@@ -1,7 +1,5 @@
 ﻿using System.Net;
-using System.Text.Json.Nodes;
 using Aton.Application.IntegrationTests.Framework.Facades;
-using NUnit.Framework;
 using NUnit.Framework.Constraints;
 
 namespace Aton.Application.IntegrationTests.Framework.Wrappers.ResponseWrapper;

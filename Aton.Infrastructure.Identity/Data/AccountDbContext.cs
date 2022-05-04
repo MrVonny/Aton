@@ -29,19 +29,6 @@ public sealed class AccountDbContext : DbContext
             .WithOne()
             .HasForeignKey<AccountToUser>(atu => atu.UserId);
 
-        var acc1 = new Account(
-            "Kitty17",
-            "hQsdf7sh", true)
-        {
-            Id = Guid.NewGuid()
-        };
-        var acc2 = new Account(
-            "Vasya1999",
-            "hQsdf7sh")
-        {
-            Id = Guid.NewGuid()
-        };
-
         modelBuilder
             .Entity<Account>()
             .HasData(
@@ -52,21 +39,6 @@ public sealed class AccountDbContext : DbContext
                 {
                     Id = Guid.NewGuid()
                 });
-
-        // modelBuilder.Entity<AccountToUser>()
-        //     .HasData(
-        //         new AccountToUser()
-        //         {
-        //             AccountId = acc1.Id,
-        //             UserId = Guid.Parse("c6a774c5-8729-454e-b1dc-348a0f220795"),
-        //             Guid = Guid.NewGuid()
-        //         },
-        //         new AccountToUser()
-        //         {
-        //             AccountId = acc2.Id,
-        //             UserId = Guid.Parse("7940d819-483c-4d27-929a-2879d41c0dad"),
-        //             Guid = Guid.NewGuid()
-        //         });
     }
     
     public async Task<int> SaveChangesWithUserAsync(string user = null)
@@ -80,32 +52,9 @@ public sealed class AccountDbContext : DbContext
         var entities = ChangeTracker.Entries()
             .Where(x => x.Entity is EntityAudit)
             .ToList();
-        //UpdateSoftDelete(entities, user);
         UpdateTimestamps(entities, user);
     }
-
-    private void UpdateSoftDelete(List<EntityEntry> entries, string user = null)
-    {
-        var filtered = entries
-            .Where(x => x.State == EntityState.Added
-                        || x.State == EntityState.Deleted);
-
-        foreach (var entry in filtered)
-        {
-            switch (entry.State)
-            {
-                case EntityState.Added:
-                    //entry.CurrentValues["IsDeleted"] = false;
-                    ((EntityAudit)entry.Entity).IsDeleted = false;
-                    break;
-                case EntityState.Deleted:
-                    entry.State = EntityState.Modified;
-                    //entry.CurrentValues["IsDeleted"] = true;
-                    ((EntityAudit)entry.Entity).IsDeleted = true;
-                    break;
-            }
-        }
-    }
+    
 
     private void UpdateTimestamps(List<EntityEntry> entries, string user = null)
     {

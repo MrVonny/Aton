@@ -1,5 +1,4 @@
 ﻿using Aton.Application.IntegrationTests.Framework.Facades;
-using Aton.Domain.Commands;
 
 namespace Aton.Application.IntegrationTests.Framework.Wrappers;
 

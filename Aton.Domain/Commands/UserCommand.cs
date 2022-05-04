@@ -1,6 +1,5 @@
 ﻿using Aton.Domain.Core.Commands;
 using Aton.Domain.Models;
-using MediatR;
 
 namespace Aton.Domain.Commands;
 

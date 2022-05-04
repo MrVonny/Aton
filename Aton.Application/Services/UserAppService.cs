@@ -3,7 +3,6 @@ using Aton.Application.ViewModels;
 using Aton.Domain.Commands;
 using Aton.Domain.Core.Bus;
 using Aton.Domain.Intefaces;
-using Aton.Domain.Models;
 using AutoMapper;
 
 namespace Aton.Application.Services;
@@ -30,21 +29,11 @@ public class UserAppService : IUserAppService
         var user = await _bus.SendCommand(createCommand);
         return user?.Id;
     }
-
-    public IEnumerable<UserViewModel> GetAll()
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task<IEnumerable<UserViewModel>> GetActiveOrdered()
     {
         var active = await _userRepository.GetActiveOrdered();
         return _mapper.Map<IEnumerable<UserViewModel>>(active);
-    }
-
-    public IEnumerable<UserViewModel> GetAll(int skip, int take)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<UserViewModel> Edit(EditUserInfoModel editUserInfoModel, string updatedBy)
@@ -61,22 +50,12 @@ public class UserAppService : IUserAppService
         return _mapper.Map<UserViewModel>(user);
     }
 
-    public void Update(UserViewModel userViewModel)
-    {
-        throw new NotImplementedException();
-    }
-
     public async Task Remove(Guid id)
     {
         var command = new DeleteUserCommand(id);
         await _bus.SendCommand(command);
     }
-
-    public IList<UserViewModel> GetAllHistory(Guid id)
-    {
-        throw new NotImplementedException();
-    }
-
+    
     public async Task Revoke(Guid guid, string revokedBy)
     {
         var command = new RevokeUserCommand(guid, revokedBy);
@@ -94,8 +73,7 @@ public class UserAppService : IUserAppService
         var command = new RestoreUserCommand(guid);
         await _bus.SendCommand(command);
     }
-
-
+    
     public void Dispose()
     {
         GC.SuppressFinalize(this);

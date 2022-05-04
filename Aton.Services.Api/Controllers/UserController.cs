@@ -7,7 +7,6 @@ using Aton.Domain.Core.Bus;
 using Aton.Domain.Core.Notifications;
 using Aton.Domain.Models;
 using Aton.Infrastructure.Identity.Managers;
-using Aton.Infrastructure.Identity.Models;
 using Aton.Services.Api.Services;
 using Aton.Services.Api.ViewModels;
 using MediatR;
