@@ -111,6 +111,8 @@ public class EditUserTests : TestBase
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Name)).EqualTo("Михайлов Алексей"))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Birthday)).EqualTo(DateTime.Parse("13-05-1999")))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Gender)).EqualTo(Gender.Unknown))
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.UpdatedAt)).EqualTo(DateTime.Now).Within(TimeSpan.FromSeconds(5.0)))
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.UpdatedBy)).EqualTo(user.Login))
             .Client.Tasks.RunAsync();
     }
 }
