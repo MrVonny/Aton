@@ -53,11 +53,11 @@ public sealed class ApplicationDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    ((EntityAudit)entry.Entity).CreatedAt = DateTime.UtcNow;
-                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
+                    ((EntityAudit)entry.Entity).CreatedAt = DateTime.Now;
+                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.Now;
                     break;
                 case EntityState.Modified:
-                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
+                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.Now;
                     break;
             }
         }

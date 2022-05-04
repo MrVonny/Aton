@@ -68,11 +68,11 @@ public sealed class AccountDbContext : DbContext
             switch (entry.State)
             {
                 case EntityState.Added:
-                    ((EntityAudit)entry.Entity).CreatedAt = DateTime.UtcNow;
+                    ((EntityAudit)entry.Entity).CreatedAt = DateTime.Now;
                     ((EntityAudit)entry.Entity).CreatedBy = user;
                     break;
                 case EntityState.Modified:
-                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.UtcNow;
+                    ((EntityAudit)entry.Entity).UpdatedAt = DateTime.Now;
                     ((EntityAudit)entry.Entity).UpdatedBy = user;
                     break;
             }
