@@ -50,6 +50,7 @@ public class UserAccountConnector : IUserAccountConnector
     {
         var aspViewModel = _mapper.Map<AspUserViewModel>(model);
         aspViewModel.Login = await _accountManager.GetUserLogin(model.Guid);
+        aspViewModel.IsAdmin = await _accountManager.IsAdminAsync(aspViewModel.Login);
         return aspViewModel;
     }
     

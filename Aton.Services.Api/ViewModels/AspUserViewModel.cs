@@ -27,4 +27,6 @@ public class AspUserViewModel
     public DateTime? RevokedAt { get; set; }
     [SwaggerSchema("Login of user who deleted it", Nullable = true)]
     public string RevokedBy { get; set; }
+    [SwaggerSchema("Is Admin", Nullable = false)]
+    public bool IsAdmin { get; set; }
 }

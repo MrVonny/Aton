@@ -32,6 +32,7 @@ public class CreateUserTests : TestBase
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.CreatedBy)).EqualTo("Admin"))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.UpdatedAt)).EqualTo(DateTime.Now).Within(TimeSpan.FromSeconds(5.0)))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.UpdatedBy)).EqualTo("Admin"))
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.IsAdmin)).EqualTo(false))
             //Get this user
             .Client.UserController
                 .GetUser(user.Login)
@@ -44,6 +45,7 @@ public class CreateUserTests : TestBase
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.CreatedBy)).EqualTo("Admin"))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.UpdatedAt)).EqualTo(DateTime.Now).Within(TimeSpan.FromSeconds(5.0)))
                     .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.UpdatedBy)).EqualTo("Admin"))
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.IsAdmin)).EqualTo(false))
             //Create duplicate
             .Client.UserController
                 .CreateUser(user)
@@ -77,6 +79,24 @@ public class CreateUserTests : TestBase
                 .CreateUser(UserStorage.GenerateValidUserViewModel)
                 .Response
                     .AssertStatusCode(HttpStatusCode.Forbidden)
+            .Client.Tasks.RunAsync();
+    }
+    
+    [Test]
+    public async Task CreateAdminTest()
+    {
+        var user = UserStorage.GenerateValidUserViewModel;
+        user.Admin = true;
+        await Client
+            .Auth
+                .LoginAsAdmin()
+            .UserController
+                .CreateUser(user)
+            .Response
+                .AssertStatusCode(HttpStatusCode.Created)
+                .Json
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.IsAdmin)).EqualTo(true))
+                    .AssertThat<AspUserViewModel>(Is.Not.Null.And.Property(nameof(AspUserViewModel.Login)).EqualTo(user.Login))
             .Client.Tasks.RunAsync();
     }
 }
