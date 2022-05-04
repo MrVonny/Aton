@@ -27,7 +27,10 @@ public abstract class TestBase
         var scopedServices = scope.ServiceProvider;
         
         var accountManager = scopedServices.GetRequiredService<AccountManager>();
-        await accountManager.CreateAsync(new Account("TestUser", "TestUser", false));
+        await accountManager.CreateAsync(new CreateAccountViewModel(
+            "TestUser", 
+            "TestUser",
+            false));
     }
 
     [TearDown]

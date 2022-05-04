@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Aton.Domain.Services.Hash;
 using Aton.Infrastructure.Identity.Data;
 using Aton.Infrastructure.Identity.Models;
 using Aton.Infrastructure.Identity.Validators;
@@ -11,11 +12,13 @@ namespace Aton.Infrastructure.Identity.Managers;
 public class AccountManager
 {
     private readonly AccountDbContext _accountContext;
+    private readonly IPasswordHasher _passwordHasher;
     public string CurrentUser { get; set; }
 
-    public AccountManager(AccountDbContext accountContext, IHttpContextAccessor httpContextAccessor)
+    public AccountManager(AccountDbContext accountContext, IHttpContextAccessor httpContextAccessor, IPasswordHasher passwordHasher)
     {
         _accountContext = accountContext;
+        _passwordHasher = passwordHasher;
         CurrentUser = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Name)?.Value;
     }
 
@@ -31,17 +34,19 @@ public class AccountManager
         return validationResult.IsValid;
     }
 
-    public async Task<IdentityResult> CreateAsync(Account account)
+    public async Task<IdentityResult> CreateAsync(CreateAccountViewModel createAccountViewModel)
     {
-        if (!ValidateLogin(account.Login, out var validationResult))
+        if (!ValidateLogin(createAccountViewModel.Login, out var validationResult))
             return new IdentityResult(validationResult.Errors);
-        if (!ValidatePassword(account.Password, out validationResult))
+        if (!ValidatePassword(createAccountViewModel.Password, out validationResult))
             return new IdentityResult(validationResult.Errors);
         
-        var find = await FindByLoginAsync(account.Login);
+        var find = await FindByLoginAsync(createAccountViewModel.Login);
         if (find != null)
             return new IdentityResult(new IdentityError("Already exists"));
-        _accountContext.Accounts.Add(account);
+
+        var passwordHash = _passwordHasher.Hash(createAccountViewModel.Password);
+        _accountContext.Accounts.Add(new Account(createAccountViewModel.Login, passwordHash, createAccountViewModel.Admin));
         await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
@@ -117,7 +122,7 @@ public class AccountManager
         if (acc == null)
             return new IdentityResult(new IdentityError("Account doesn't exists"));
         
-        acc.Password = newPassword;
+        acc.PasswordHash = _passwordHasher.Hash(newPassword);
         await _accountContext.SaveChangesWithUserAsync(CurrentUser);
         return new IdentityResult();
     }
@@ -185,4 +190,18 @@ public class IdentityError
         Description = description;
     }
     public string Description { get; protected set; }
+}
+
+public class CreateAccountViewModel
+{
+    public CreateAccountViewModel(string login, string password, bool admin = false)
+    {
+        Login = login;
+        Password = password;
+        Admin = admin;
+    }
+    
+    public string Login { get; protected set; }
+    public string Password { get; protected set; }
+    public bool Admin { get; protected set; }
 }

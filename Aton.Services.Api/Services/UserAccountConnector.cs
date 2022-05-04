@@ -78,7 +78,7 @@ public class UserAccountConnector : IUserAccountConnector
 
     public async Task<AspUserViewModel> CreateUser(AspCreateUserViewModel viewModel)
     {
-        var account = new Account(
+        var account = new CreateAccountViewModel(
             viewModel.Login,
             viewModel.Password,
             viewModel.Admin.GetValueOrDefault());

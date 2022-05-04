@@ -34,7 +34,7 @@ public sealed class AccountDbContext : DbContext
             .HasData(
                 new Account(
                     "Admin",
-                    "Admin123",
+                    "10000.F7u53wgI2rVPR1dEvGHwcQ==.iMMgUCC7ELv9Bphqndc6kByHOq5aocfu2pS2UiMBZzI=",
                     true)
                 {
                     Id = Guid.NewGuid()
