@@ -86,7 +86,6 @@ public class UserController : ApiController
         var user = await _userAccountConnector.GetByLogin(login);
         if (user == null)
         {
-            NotifyError(string.Empty, "Can't find user");
             return Response();
         }
 
@@ -106,7 +105,6 @@ public class UserController : ApiController
         
         if (user == null)
         {
-            NotifyError(string.Empty,"Can't find user");
             return Response();
         }
 

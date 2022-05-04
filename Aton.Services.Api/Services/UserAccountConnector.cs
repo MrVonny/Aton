@@ -137,7 +137,7 @@ public class UserAccountConnector : IUserAccountConnector
             AddIdentityErrors(result);
             return;
         }
-        _userAppService.Remove(guid.Value);
+        await _userAppService.Remove(guid.Value);
     }
 
     public async Task Revoke(string login)
